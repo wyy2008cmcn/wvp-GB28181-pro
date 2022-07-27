@@ -13,7 +13,7 @@ spring:
         # [可选] 数据库 DB
         database: 6
         # [可选] 访问密码,若你的redis服务器没有设置密码，就不需要用密码去连接
-        password: 123456
+        password: root
         # [可选] 超时时间
         timeout: 10000
         # mysql数据源
@@ -66,7 +66,7 @@ sip:
 media:
     id: FQ3TF8yT83wh5Wvz
     # [必须修改] zlm服务器的内网IP
-    ip: 192.168.41.16
+    ip: 47.94.225.212
     # [必须修改] zlm服务器的http.port
     http-port: 9080
     # [可选] zlm服务器的hook.admin_params=secret
