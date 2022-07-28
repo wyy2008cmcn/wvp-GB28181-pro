@@ -66,7 +66,7 @@ sip:
 media:
     id: FQ3TF8yT83wh5Wvz
     # [必须修改] zlm服务器的内网IP
-    ip: 47.94.225.212
+    ip: 47.93.59.141
     # [必须修改] zlm服务器的http.port
     http-port: 9080
     # [可选] zlm服务器的hook.admin_params=secret
