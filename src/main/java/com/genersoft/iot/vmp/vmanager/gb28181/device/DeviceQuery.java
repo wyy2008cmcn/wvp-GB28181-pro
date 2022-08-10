@@ -2,6 +2,8 @@ package com.genersoft.iot.vmp.vmanager.gb28181.device;
 
 import com.alibaba.fastjson.JSONObject;
 import com.genersoft.iot.vmp.conf.DynamicTask;
+import com.genersoft.iot.vmp.conf.security.SecurityUtils;
+import com.genersoft.iot.vmp.conf.security.dto.LoginUser;
 import com.genersoft.iot.vmp.gb28181.bean.Device;
 import com.genersoft.iot.vmp.gb28181.bean.DeviceChannel;
 import com.genersoft.iot.vmp.gb28181.bean.SubscribeHolder;
@@ -16,6 +18,7 @@ import com.genersoft.iot.vmp.service.IDeviceChannelService;
 import com.genersoft.iot.vmp.service.IDeviceService;
 import com.genersoft.iot.vmp.storager.IRedisCatchStorage;
 import com.genersoft.iot.vmp.storager.IVideoManagerStorage;
+import com.genersoft.iot.vmp.storager.dao.dto.Role;
 import com.genersoft.iot.vmp.vmanager.bean.BaseTree;
 import com.genersoft.iot.vmp.vmanager.bean.WVPResult;
 import com.github.pagehelper.PageInfo;
@@ -111,8 +114,21 @@ public class DeviceQuery {
 //		if (logger.isDebugEnabled()) {
 //			logger.debug("查询所有视频设备API调用");
 //		}
-		
-		return storager.queryVideoDeviceList(page, count);
+		LoginUser userInfo = SecurityUtils.getUserInfo();
+		if(userInfo == null) {
+			return null;
+		}
+		Role role = userInfo.getRole();
+
+		PageInfo<Device> devicePageInfo = storager.queryVideoDeviceList(page, count);
+		if(Role.AuthorityEnum.ADMIN.getAuthority().equals(role.getAuthority())) {
+			return devicePageInfo;
+		}
+		List<String> roles = Role.AuthorityEnum.listAuthorityByAuthority(role.getAuthority());
+		List<Device> devices = devicePageInfo.getList();
+		devices.removeIf(device -> !roles.contains(device.getAuthority()));
+
+		return devicePageInfo;
 	}
 
 	/**

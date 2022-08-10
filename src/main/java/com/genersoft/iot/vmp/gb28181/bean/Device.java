@@ -143,6 +143,8 @@ public class Device {
 	 */
 	private String treeType;
 
+	private String authority;
+
 
 	public String getDeviceId() {
 		return deviceId;
@@ -350,5 +352,13 @@ public class Device {
 
 	public void setTreeType(String treeType) {
 		this.treeType = treeType;
+	}
+
+	public String getAuthority() {
+		return authority;
+	}
+
+	public void setAuthority(String authority) {
+		this.authority = authority;
 	}
 }

@@ -11,7 +11,7 @@ spring:
         # [必须修改] 端口号
         port: 6379
         # [可选] 数据库 DB
-        database: 6
+        # database: 6
         # [可选] 访问密码,若你的redis服务器没有设置密码，就不需要用密码去连接
         password: root
         # [可选] 超时时间
