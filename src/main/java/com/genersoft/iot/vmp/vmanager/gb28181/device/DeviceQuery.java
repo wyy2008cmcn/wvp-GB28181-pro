@@ -1,5 +1,6 @@
 package com.genersoft.iot.vmp.vmanager.gb28181.device;
 
+import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONObject;
 import com.genersoft.iot.vmp.conf.DynamicTask;
 import com.genersoft.iot.vmp.conf.security.SecurityUtils;
@@ -118,17 +119,9 @@ public class DeviceQuery {
 		if(userInfo == null) {
 			return null;
 		}
-		Role role = userInfo.getRole();
+		List<String> roles = Role.AuthorityEnum.listAuthorityByAuthority(userInfo.getRole().getAuthority());
 
-		PageInfo<Device> devicePageInfo = storager.queryVideoDeviceList(page, count);
-		if(Role.AuthorityEnum.ADMIN.getAuthority().equals(role.getAuthority())) {
-			return devicePageInfo;
-		}
-		List<String> roles = Role.AuthorityEnum.listAuthorityByAuthority(role.getAuthority());
-		List<Device> devices = devicePageInfo.getList();
-		devices.removeIf(device -> !roles.contains(device.getAuthority()));
-
-		return devicePageInfo;
+		return storager.queryVideoDeviceList(page, count, roles);
 	}
 
 	/**

@@ -13,6 +13,7 @@ import com.genersoft.iot.vmp.storager.IRedisCatchStorage;
 import com.genersoft.iot.vmp.storager.IVideoManagerStorage;
 import com.genersoft.iot.vmp.storager.dao.*;
 import com.genersoft.iot.vmp.storager.dao.dto.ChannelSourceInfo;
+import com.genersoft.iot.vmp.storager.dao.dto.Role;
 import com.genersoft.iot.vmp.utils.DateUtil;
 import com.genersoft.iot.vmp.vmanager.gb28181.platform.bean.ChannelReduce;
 import com.github.pagehelper.PageHelper;
@@ -277,9 +278,9 @@ public class VideoManagerStorageImpl implements IVideoManagerStorage {
 	 * @return PageInfo<Device> 分页设备对象数组
 	 */
 	@Override
-	public PageInfo<Device> queryVideoDeviceList(int page, int count) {
+	public PageInfo<Device> queryVideoDeviceList(int page, int count, List<String> authoritys) {
 		PageHelper.startPage(page, count);
-		List<Device> all = deviceMapper.getDevices();
+		List<Device> all = deviceMapper.getDevices(authoritys);
 		return new PageInfo<>(all);
 	}
 
@@ -291,7 +292,7 @@ public class VideoManagerStorageImpl implements IVideoManagerStorage {
 	@Override
 	public List<Device> queryVideoDeviceList() {
 
-		List<Device> deviceList =  deviceMapper.getDevices();
+		List<Device> deviceList =  deviceMapper.getDevices(Collections.singletonList("-1"));
 		return deviceList;
 	}
 

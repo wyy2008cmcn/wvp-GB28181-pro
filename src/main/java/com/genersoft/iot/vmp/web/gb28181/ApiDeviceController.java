@@ -11,6 +11,8 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.Arrays;
+import java.util.Collections;
 import java.util.List;
 
 /**
@@ -59,7 +61,7 @@ public class ApiDeviceController {
             devices = storager.queryVideoDeviceList();
             result.put("DeviceCount", devices.size());
         }else {
-            PageInfo<Device> deviceList = storager.queryVideoDeviceList(start/limit, limit);
+            PageInfo<Device> deviceList = storager.queryVideoDeviceList(start/limit, limit, Collections.singletonList("-1"));
             result.put("DeviceCount", deviceList.getTotal());
             devices = deviceList.getList();
         }

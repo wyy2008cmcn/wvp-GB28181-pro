@@ -73,7 +73,9 @@ public class Role {
 
         public static List<String> listAuthorityByAuthority(String authority) {
 
-            if(LEADER.getAuthority().equals(authority)) {
+            if(ADMIN.getAuthority().equals(authority)){
+                return Arrays.asList(ADMIN.getAuthority(), LEADER.getAuthority(), STAFF.getAuthority());
+            }else if(LEADER.getAuthority().equals(authority)) {
                 return Arrays.asList(LEADER.getAuthority(), STAFF.getAuthority());
             } else if(STAFF.getAuthority().equals(authority)) {
                 return Collections.singletonList(STAFF.getAuthority());

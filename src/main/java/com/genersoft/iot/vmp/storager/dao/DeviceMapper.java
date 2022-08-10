@@ -98,8 +98,12 @@ public interface DeviceMapper {
             " </script>"})
     int update(Device device);
 
-    @Select("SELECT *, (SELECT count(0) FROM device_channel WHERE deviceId=de.deviceId) as channelCount  FROM device de")
-    List<Device> getDevices();
+
+    @Select(value = {" <script>" +
+            "SELECT *, (SELECT count(0) FROM device_channel WHERE deviceId=de.deviceId) as channelCount  FROM device de  where de.authority in " +
+            "<foreach collection='authoritys' open='(' item='item' separator=',' close=')'> '${item}'</foreach>" +
+            " </script>"})
+    List<Device> getDevices(List<String> authoritys);
 
     @Delete("DELETE FROM device WHERE deviceId=#{deviceId}")
     int del(String deviceId);
