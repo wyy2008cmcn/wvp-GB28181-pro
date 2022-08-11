@@ -37,7 +37,7 @@ export default new VueRouter({
       path: '/',
       name: 'home',
       component: Layout,
-      redirect: '/live',
+      redirect: '/deviceList',
       children: [
         {
           path: '/control',
