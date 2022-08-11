@@ -57,6 +57,13 @@
           <el-form-item v-if="form.subscribeCycleForMobilePosition > 0" label="移动位置报送间隔" prop="subscribeCycleForCatalog" >
             <el-input v-model="form.mobilePositionSubmissionInterval" clearable ></el-input>
           </el-form-item>
+          <el-form-item label="设备权限" prop="charset" >
+            <el-select v-model="form.authority" style="float: left; width: 100%" >
+              <el-option key="0" label="管理员" value="0"></el-option>
+              <el-option key="1" label="主管" value="1"></el-option>
+              <el-option key="2" label="员工" value="2"></el-option>
+            </el-select>
+          </el-form-item>
           <el-form-item label="其他选项">
             <el-checkbox label="SSRC校验" v-model="form.ssrcCheck" style="float: left"></el-checkbox>
           </el-form-item>

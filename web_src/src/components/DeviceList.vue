@@ -64,9 +64,9 @@
                      @click="showDevicePosition(scope.row)">定位
           </el-button>
           <el-divider direction="vertical"></el-divider>
-          <el-button size="medium" icon="el-icon-edit" type="text" @click="edit(scope.row)">编辑</el-button>
+          <el-button size="medium" v-if="editUser"  icon="el-icon-edit" type="text" @click="edit(scope.row)">编辑</el-button>
           <el-divider direction="vertical"></el-divider>
-          <el-button size="medium" icon="el-icon-delete" type="text" @click="deleteDevice(scope.row)" style="color: #f56c6c">删除</el-button>
+          <el-button size="medium" v-if="editUser" icon="el-icon-delete" type="text" @click="deleteDevice(scope.row)" style="color: #f56c6c">删除</el-button>
         </template>
       </el-table-column>
     </el-table>
@@ -110,6 +110,7 @@ export default {
       count: 15,
       total: 0,
       getDeviceListLoading: false,
+      editUser: this.$cookies.get("session").roleId===1
     };
   },
   computed: {

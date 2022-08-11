@@ -48,7 +48,7 @@ export default {
       alarmNotify: false,
       sseSource: null,
       activeIndex: this.$route.path,
-      editUser: this.$cookies.get("session").roleId==1
+      editUser: this.$cookies.get("session").roleId===1
     };
   },
   created() {
