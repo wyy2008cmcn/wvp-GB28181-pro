@@ -60,7 +60,7 @@
                      @click="showChannelList(scope.row)">通道
           </el-button>
           <el-divider direction="vertical"></el-divider>
-          <el-button size="medium" icon="el-icon-location" type="text"
+          <el-button size="medium"  v-if="editUser" icon="el-icon-location" type="text"
                      @click="showDevicePosition(scope.row)">定位
           </el-button>
           <el-divider direction="vertical"></el-divider>
