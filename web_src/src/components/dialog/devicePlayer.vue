@@ -156,17 +156,15 @@
           </el-tab-pane>
           <!--{"code":0,"data":{"paths":["22-29-30.mp4"],"rootPath":"/home/kkkkk/Documents/ZLMediaKit/release/linux/Debug/www/record/hls/kkkkk/2020-05-11/"}}-->
           <el-tab-pane label="录像查询" name="record" v-if="showRrecord">
-            <div style="width: 100%; text-align: left" ref="form">
-              <el-form-item label="单号" prop="billCode">
-                <el-input clearable></el-input>
-              </el-form-item>
-              <el-form-item>
-                <div style="float: right;">
-                  <el-button type="primary" @click="onSubmit">确认</el-button>
-                </div>
-              </el-form-item>
-            </div>
             <div style="width: 100%;">
+              <div style="width: 100%; text-align: left" >
+                <el-form ref="form" label-width="80px" style="margin-left: 1rem;">
+                  <el-form-item label="单号" prop="billCode">
+                    <el-input v-model="billCode" clearable></el-input>
+                  </el-form-item>
+                  <el-button type="primary" @click="onSubmit" >确认</el-button>
+                </el-form>
+              </div>
               <div style="width: 100%; text-align: left">
                 <span>录像控制</span>
                 <el-button-group style="margin-left: 1rem;">
@@ -441,6 +439,7 @@
         recordStartTime: 0,
         showTimeText: "00:00:00",
         streamInfo: null,
+        billCode: ''
       };
     },
     methods: {
@@ -853,7 +852,9 @@
       },
       onSubmit: function () {
         console.log("device palyer onSubmit");
-        console.log(this.form);
+        console.log(this.billCode);
+        console.log(this.deviceId)
+        console.log(this.channelId)
       },
       gbPlay() {
         console.log('前端控制：播放');
