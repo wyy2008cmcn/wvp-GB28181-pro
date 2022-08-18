@@ -39,13 +39,13 @@
     </el-aside>
     <el-main style="padding: 5px;">
       <el-table ref="channelListTable" :data="deviceChannelList" :height="winHeight" style="width: 100%" header-row-class-name="table-header">
-        <el-table-column prop="channelId" label="通道编号" min-width="200">
+        <el-table-column prop="channelId"  v-if="editUser" label="通道编号" min-width="200">
         </el-table-column>
-        <el-table-column prop="deviceId" label="设备编号" min-width="200">
+        <el-table-column prop="deviceId"  v-if="editUser" label="设备编号" min-width="200">
         </el-table-column>
-        <el-table-column prop="name" label="通道名称" min-width="200">
+        <el-table-column prop="name" label="摄像头名称" min-width="200">
         </el-table-column>
-        <el-table-column label="快照" min-width="120">
+        <el-table-column label="快照"  v-if="editUser" min-width="120">
           <template v-slot:default="scope">
             <el-image
               :src="getSnap(scope.row)"
@@ -59,18 +59,18 @@
             </el-image>
           </template>
         </el-table-column>
-        <el-table-column prop="subCount" label="子节点数" min-width="120">
+        <el-table-column prop="subCount"   v-if="editUser"  label="子节点数" min-width="120">
         </el-table-column>
-        <el-table-column prop="manufacture" label="厂家" min-width="120">
+        <el-table-column prop="manufacture"  v-if="editUser" label="厂家" min-width="120">
         </el-table-column>
-        <el-table-column label="位置信息"  min-width="200">
+        <el-table-column label="位置信息"  v-if="editUser"  min-width="200">
           <template slot-scope="scope">
             <span v-if="scope.row.longitude*scope.row.latitude > 0">{{ scope.row.longitude }},<br>{{ scope.row.latitude }}</span>
             <span v-if="scope.row.longitude*scope.row.latitude === 0">无</span>
           </template>
         </el-table-column>
-        <el-table-column prop="ptztypeText" label="云台类型" min-width="120"/>
-        <el-table-column label="开启音频" min-width="120">
+        <el-table-column prop="ptztypeText"  v-if="editUser" label="云台类型" min-width="120"/>
+        <el-table-column label="开启音频"  v-if="editUser" min-width="120">
           <template slot-scope="scope">
             <el-switch @change="updateChannel(scope.row)" v-model="scope.row.hasAudio" active-color="#409EFF">
             </el-switch>
@@ -88,7 +88,7 @@
 
         <el-table-column label="操作" min-width="280" fixed="right">
           <template slot-scope="scope">
-            <el-button size="medium" v-bind:disabled="device == null || device.online === 0" icon="el-icon-video-play" type="text" @click="sendDevicePush(scope.row)">播放</el-button>
+            <el-button size="medium" v-bind:disabled="device == null || device.online === 0" icon="el-icon-video-play" type="text" @click="sendDevicePush(scope.row)">实时监控</el-button>
             <el-button size="medium" v-bind:disabled="device == null || device.online === 0" icon="el-icon-switch-button" type="text"  style="color: #f56c6c" v-if="!!scope.row.streamId"
                        @click="stopDevicePush(scope.row)">停止
             </el-button>
@@ -97,7 +97,7 @@
                        @click="changeSubchannel(scope.row)">查看
             </el-button>
             <el-divider v-if="scope.row.subCount > 0 || scope.row.parental === 1" direction="vertical"></el-divider>
-            <el-button size="medium" v-bind:disabled="device == null || device.online === 0" icon="el-icon-video-camera" type="text" @click="queryRecords(scope.row)">设备录像
+            <el-button size="medium" v-bind:disabled="device == null || device.online === 0" icon="el-icon-video-camera" type="text" @click="queryRecords(scope.row)">历史监控
             </el-button>
           </template>
         </el-table-column>
@@ -154,7 +154,8 @@ export default {
       beforeUrl: "/deviceList",
       isLoging: false,
       showTree: false,
-      loadSnap: {}
+      loadSnap: {},
+      editUser: this.$cookies.get("session").roleId===1
     };
   },
 

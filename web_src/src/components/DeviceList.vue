@@ -20,7 +20,7 @@
           </div>
         </template>
       </el-table-column>
-      <el-table-column prop="manufacturer" label="厂家" min-width="120" >
+      <el-table-column prop="manufacturer" v-if="editUser" label="厂家" min-width="120" >
       </el-table-column>
       <el-table-column label="流传输模式" v-if="editUser"  min-width="160" >
         <template slot-scope="scope">
@@ -31,7 +31,7 @@
           </el-select>
         </template>
       </el-table-column>
-      <el-table-column prop="channelCount" label="通道数" min-width="120" >
+      <el-table-column prop="channelCount" label="摄像头数量" min-width="120" >
       </el-table-column>
       <el-table-column label="状态" min-width="120">
         <template slot-scope="scope">
@@ -41,9 +41,9 @@
           </div>
         </template>
       </el-table-column>
-      <el-table-column prop="keepaliveTime" label="最近心跳" min-width="160" >
+      <el-table-column prop="keepaliveTime" v-if="editUser" label="最近心跳" min-width="160" >
       </el-table-column>
-      <el-table-column prop="registerTime" label="最近注册"  min-width="160">
+      <el-table-column prop="registerTime" v-if="editUser" label="最近注册"  min-width="160">
       </el-table-column>
 <!--      <el-table-column prop="updateTime" label="更新时间"  width="140">-->
 <!--      </el-table-column>-->
@@ -52,12 +52,12 @@
 
       <el-table-column label="操作" min-width="450" fixed="right">
         <template slot-scope="scope">
-          <el-button type="text" size="medium" v-bind:disabled="scope.row.online==0" icon="el-icon-refresh" @click="refDevice(scope.row)"
+          <el-button type="text" size="medium" v-if="editUser" v-bind:disabled="scope.row.online==0" icon="el-icon-refresh" @click="refDevice(scope.row)"
                      @mouseover="getTooltipContent(scope.row.deviceId)">刷新
           </el-button>
           <el-divider direction="vertical"></el-divider>
           <el-button type="text" size="medium" icon="el-icon-video-camera"
-                     @click="showChannelList(scope.row)">通道
+                     @click="showChannelList(scope.row)">查看
           </el-button>
           <el-divider direction="vertical"></el-divider>
           <el-button size="medium"  v-if="editUser" icon="el-icon-location" type="text"
