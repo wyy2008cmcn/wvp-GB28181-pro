@@ -174,22 +174,11 @@
               <div>
                 <div class="demo-collapse">
                   <el-collapse accordion>
-                    <template v-for="data in listData" :key="data.billCode">
-                      <el-collapse-item :title="data.billCode" :name="data.billCode">
-                        <div>
-                          <template v-for="tracklog in data.tracklog" :key="tracklog.info">
-                            <el-row>
-                              <el-col :span="2">
-                                {{tracklog.info}}
-                              </el-col>
-                              <el-col :span="6" @click="byBillCodePlay(data.billCode, $event)">
-                                {{tracklog.scanTime}}
-                              </el-col>
-                            </el-row>
-                          </template>
-                        </div>
-                      </el-collapse-item>
-                    </template>
+                    <el-collapse-item v-for="data in listData" :key="data.billCode" :title="data.billCode" :name="data.billCode">
+                      <div v-for="(tracklog, index) in data.tracklog" :key="'button' + index" style="margin-bottom: 10px; text-align: left">
+                        <el-button type="primary" size="mini" plain @click="byBillCodePlay(data.billCode, $event)">{{ tracklog.info }}： {{ tracklog.scanTime }}</el-button>
+                      </div>
+                    </el-collapse-item>
                   </el-collapse>
                 </div>
               </div>
