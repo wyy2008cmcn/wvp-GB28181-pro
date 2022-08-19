@@ -174,11 +174,11 @@
               <div>
                 <template v-for="data in listData" :key="data.id">
                   <el-row>
-                    <el-col :span="6">
-                      data.info
+                    <el-col :span="2">
+                      {{data.info}}
                     </el-col>
-                    <el-col :span="18">
-                      data.scanTime
+                    <el-col :span="6" @click="onSubmit">
+                      {{data.scanTime}}
                     </el-col>
                   </el-row>
                 </template>
@@ -874,7 +874,45 @@ export default {
       console.log(this.billCode);
       console.log(this.deviceId)
       console.log(this.channelId)
-      this.listData = JSON.parse('[{"info":"网点1","scanTime":"2022-08-19 16:00:00"},{"info":"网点2","scanTime":"2022-08-19 16:00:00"},{"info":"网点3","scanTime":"2022-08-19 16:00:00"}]')
+      this.listData = JSON.parse('[\n' +
+        '  {\n' +
+        '    "billCode":"11111",\n' +
+        '    "tracklog":[\n' +
+        '      {\n' +
+        '        "info":"网点1",\n' +
+        '        "scanTime":"2022-08-19 16:00:00"\n' +
+        '      },\n' +
+        '      {\n' +
+        '        "info":"网点2",\n' +
+        '        "scanTime":"2022-08-19 16:00:00"\n' +
+        '      },\n' +
+        '      {\n' +
+        '        "info":"网点3",\n' +
+        '        "scanTime":"2022-08-19 16:00:00"\n' +
+        '      }\n' +
+        '    ]\n' +
+        '  },\n' +
+        '  {\n' +
+        '    "billCode":"2222",\n' +
+        '    "tracklog":[\n' +
+        '      {\n' +
+        '        "info":"网点1",\n' +
+        '        "scanTime":"2022-08-19 16:00:00"\n' +
+        '      },\n' +
+        '      {\n' +
+        '        "info":"网点2",\n' +
+        '        "scanTime":"2022-08-19 16:00:00"\n' +
+        '      },\n' +
+        '      {\n' +
+        '        "info":"网点3",\n' +
+        '        "scanTime":"2022-08-19 16:00:00"\n' +
+        '      }\n' +
+        '    ],\n' +
+        '  }\n' +
+        ']')
+    },
+    byBillCodePlay: function (data) {
+      console.log(data)
     },
     gbPlay() {
       console.log('前端控制：播放');
