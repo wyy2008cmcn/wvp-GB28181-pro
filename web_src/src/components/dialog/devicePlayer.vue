@@ -172,16 +172,26 @@
                 </el-form>
               </div>
               <div>
-                <template v-for="data in listData" :key="data.id">
-                  <el-row>
-                    <el-col :span="2">
-                      {{data.info}}
-                    </el-col>
-                    <el-col :span="6" @click="byBillCodePlay">
-                      {{data.scanTime}}
-                    </el-col>
-                  </el-row>
-                </template>
+                <div class="demo-collapse">
+                  <el-collapse accordion>
+                    <template v-for="data in listData" :key="data.billCode">
+                      <el-collapse-item :title="data.billCode" :name="data.billCode">
+                        <div>
+                          <template v-for="tracklog in data.tracklog" :key="tracklog.info">
+                            <el-row>
+                              <el-col :span="2">
+                                {{tracklog.info}}
+                              </el-col>
+                              <el-col :span="6" @click="byBillCodePlay(data.billCode, $event)">
+                                {{tracklog.scanTime}}
+                              </el-col>
+                            </el-row>
+                          </template>
+                        </div>
+                      </el-collapse-item>
+                    </template>
+                  </el-collapse>
+                </div>
               </div>
               <div style="width: 100%; text-align: left">
                 <span>录像控制</span>
@@ -874,45 +884,11 @@ export default {
       console.log(this.billCode);
       console.log(this.deviceId)
       console.log(this.channelId)
-      this.listData = JSON.parse('[\n' +
-        '  {\n' +
-        '    "billCode":"11111",\n' +
-        '    "tracklog":[\n' +
-        '      {\n' +
-        '        "info":"网点1",\n' +
-        '        "scanTime":"2022-08-19 16:00:00"\n' +
-        '      },\n' +
-        '      {\n' +
-        '        "info":"网点2",\n' +
-        '        "scanTime":"2022-08-19 16:00:00"\n' +
-        '      },\n' +
-        '      {\n' +
-        '        "info":"网点3",\n' +
-        '        "scanTime":"2022-08-19 16:00:00"\n' +
-        '      }\n' +
-        '    ]\n' +
-        '  },\n' +
-        '  {\n' +
-        '    "billCode":"2222",\n' +
-        '    "tracklog":[\n' +
-        '      {\n' +
-        '        "info":"网点1",\n' +
-        '        "scanTime":"2022-08-19 16:00:00"\n' +
-        '      },\n' +
-        '      {\n' +
-        '        "info":"网点2",\n' +
-        '        "scanTime":"2022-08-19 16:00:00"\n' +
-        '      },\n' +
-        '      {\n' +
-        '        "info":"网点3",\n' +
-        '        "scanTime":"2022-08-19 16:00:00"\n' +
-        '      }\n' +
-        '    ],\n' +
-        '  }\n' +
-        ']')
+      this.listData = JSON.parse('[{"billCode":"11111","tracklog":[{"info":"网点1","scanTime":"2022-08-19 16:00:00"},{"info":"网点2","scanTime":"2022-08-19 16:00:00"},{"info":"网点3","scanTime":"2022-08-19 16:00:00"}]},{"billCode":"2222","tracklog":[{"info":"网点1","scanTime":"2022-08-19 16:00:00"},{"info":"网点2","scanTime":"2022-08-19 16:00:00"},{"info":"网点3","scanTime":"2022-08-19 16:00:00"}]}]')
     },
-    byBillCodePlay: function (data) {
-      console.log(data)
+    byBillCodePlay: function (billCode, event) {
+      console.log(billCode)
+      console.info(event)
     },
     gbPlay() {
       console.log('前端控制：播放');
