@@ -873,11 +873,23 @@ export default {
       console.log(this.billCode);
       console.log(this.deviceId)
       console.log(this.channelId)
-      this.listData = JSON.parse('[{"billCode":"11111","tracklog":[{"info":"网点1","scanTime":"2022-08-19 16:00:00"},{"info":"网点2","scanTime":"2022-08-19 16:00:00"},{"info":"网点3","scanTime":"2022-08-19 16:00:00"}]},{"billCode":"2222","tracklog":[{"info":"网点1","scanTime":"2022-08-19 16:00:00"},{"info":"网点2","scanTime":"2022-08-19 16:00:00"},{"info":"网点3","scanTime":"2022-08-19 16:00:00"}]}]')
+
+      this.$axios({
+        method: 'get',
+        url: '/api/playback/byBillCode/' + this.billCode + '/' + this.deviceId + "/" + this.channelId
+      }).then((res) => {
+        console.log(res)
+        this.listData = res;
+      });
+
     },
     byBillCodePlay: function (billCode, event) {
       console.log(billCode)
       console.info(event)
+      var row;
+      row.startTime = "2022-08-18 20:00:00";
+      row.endTime = "2022-08-18 21:00:00";
+      this.playRecord(row);
     },
     gbPlay() {
       console.log('前端控制：播放');

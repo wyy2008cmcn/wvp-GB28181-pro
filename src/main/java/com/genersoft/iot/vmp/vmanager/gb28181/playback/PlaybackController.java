@@ -1,20 +1,31 @@
 package com.genersoft.iot.vmp.vmanager.gb28181.playback;
 
+import com.alibaba.fastjson.JSON;
 import com.genersoft.iot.vmp.common.StreamInfo;
+import com.genersoft.iot.vmp.gb28181.bean.RecordInfo;
 import com.genersoft.iot.vmp.gb28181.transmit.callback.DeferredResultHolder;
 //import com.genersoft.iot.vmp.media.zlm.ZLMRESTfulUtils;
+import com.genersoft.iot.vmp.gb28181.transmit.callback.RequestMessage;
 import com.genersoft.iot.vmp.service.IMediaServerService;
 import com.genersoft.iot.vmp.storager.IRedisCatchStorage;
 import com.genersoft.iot.vmp.service.IPlayService;
+import com.genersoft.iot.vmp.utils.HttpClientUtils;
+import com.genersoft.iot.vmp.vmanager.bean.BillCodeInfos;
+import com.genersoft.iot.vmp.vmanager.bean.TrackInfoDTO;
+import com.genersoft.iot.vmp.vmanager.bean.TrackResult;
+import com.genersoft.iot.vmp.vmanager.bean.WVPResult;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiImplicitParam;
 import io.swagger.annotations.ApiImplicitParams;
 import io.swagger.annotations.ApiOperation;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.util.CollectionUtils;
 import org.springframework.util.StringUtils;
 import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -27,6 +38,8 @@ import com.genersoft.iot.vmp.gb28181.bean.Device;
 import com.genersoft.iot.vmp.gb28181.transmit.cmd.impl.SIPCommander;
 import com.genersoft.iot.vmp.storager.IVideoManagerStorage;
 import org.springframework.web.context.request.async.DeferredResult;
+
+import java.util.*;
 
 @Api(tags = "视频回放")
 @CrossOrigin
@@ -57,6 +70,9 @@ public class PlaybackController {
 	@Autowired
 	private IMediaServerService mediaServerService;
 
+	@Value("${bill.url}")
+	private String billUrl;
+
 	@ApiOperation("开始视频回放")
 	@ApiImplicitParams({
 			@ApiImplicitParam(name = "deviceId", value = "设备ID", dataTypeClass = String.class),
@@ -77,6 +93,45 @@ public class PlaybackController {
 		});
 
 		return result;
+	}
+
+
+	@ApiOperation("根据单号跳转播放")
+	@ApiImplicitParams({
+			@ApiImplicitParam(name = "billCode", value = "单号", dataTypeClass = String.class),
+			@ApiImplicitParam(name = "deviceId", value = "设备号", dataTypeClass = Long.class),
+			@ApiImplicitParam(name = "channelId", value = "通道", dataTypeClass = Long.class),
+	})
+	@GetMapping("/byBillCode/{billCode}/{deviceId}/{channelId}")
+	public ResponseEntity<String> byBillCode(@PathVariable String billCode, @PathVariable String deviceId, @PathVariable String channelId) {
+		if(StringUtils.isEmpty(billCode)) {
+			return new ResponseEntity<>(JSON.toJSONString(Collections.emptyList()), HttpStatus.OK);
+		}
+		String[] billCodeSplit = billCode.split(",");
+
+		StringBuilder billCodes = new StringBuilder();
+
+		for (String value : billCodeSplit) {
+			billCodes.append(value);
+			billCodes.append(";");
+		}
+
+		BillCodeInfos billCodeInfos = BillCodeInfos.builder().bills(billCodes.toString()).build();
+
+		String trackInfo = HttpClientUtils.getDataToJson(billUrl, 1000, 1000, 1000, null, JSON.toJSONString(billCodeInfos));
+		TrackResult trackInfoDTO = JSON.parseObject(trackInfo, TrackResult.class);
+		trackInfoDTO.getResultJson().forEach(info -> {
+			if(!CollectionUtils.isEmpty(info.getTracklog())) {
+				info.getTracklog().removeIf(log -> Optional.ofNullable(log.getInfo()).map(s -> {
+					if(s.contains("揽收")|| s.contains("到达")||s.contains("派件")||s.contains("嘉兴")) {
+						return false;
+					}
+					return true;
+				}).orElse(true));
+			}
+		});
+
+		return new ResponseEntity<>(JSON.toJSONString(trackInfoDTO.getResultJson()), HttpStatus.OK);
 	}
 
 	@ApiOperation("停止视频回放")
