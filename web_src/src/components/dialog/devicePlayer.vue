@@ -159,11 +159,29 @@
             <div style="width: 100%;">
               <div style="width: 100%; text-align: left" >
                 <el-form ref="form" label-width="80px" style="margin-left: 1rem;">
-                  <el-form-item label="单号" prop="billCode">
-                    <el-input v-model="billCode" clearable></el-input>
-                  </el-form-item>
-                  <el-button type="primary" @click="onSubmit" >确认</el-button>
+                  <el-row>
+                    <el-col :span="18">
+                      <el-form-item label="单号" prop="billCode">
+                        <el-input v-model="billCode" clearable></el-input>
+                      </el-form-item>
+                    </el-col>
+                    <el-col :span="6">
+                      <el-button type="primary" @click="onSubmit" >确认</el-button>
+                    </el-col>
+                  </el-row>
                 </el-form>
+              </div>
+              <div>
+                <template v-for="data in listData" :key="data.id">
+                  <el-row>
+                    <el-col :span="6">
+                      data.info
+                    </el-col>
+                    <el-col :span="18">
+                      data.scanTime
+                    </el-col>
+                  </el-row>
+                </template>
               </div>
               <div style="width: 100%; text-align: left">
                 <span>录像控制</span>
@@ -364,292 +382,358 @@
 </template>
 
 <script>
-  import rtcPlayer from '../dialog/rtcPlayer.vue'
-  // import LivePlayer from '@liveqing/liveplayer'
-  // import player from '../dialog/easyPlayer.vue'
-  import jessibucaPlayer from '../common/jessibuca.vue'
-  import recordDownload from '../dialog/recordDownload.vue'
+import rtcPlayer from '../dialog/rtcPlayer.vue'
+// import LivePlayer from '@liveqing/liveplayer'
+// import player from '../dialog/easyPlayer.vue'
+import jessibucaPlayer from '../common/jessibuca.vue'
+import recordDownload from '../dialog/recordDownload.vue'
 
-  export default {
-    name: 'devicePlayer',
-    props: {},
-    components: {
-      jessibucaPlayer, rtcPlayer, recordDownload,
-    },
-    computed: {
-      getPlayerShared: function () {
-        return {
-          sharedUrl: window.location.origin + '/#/play/wasm/' + encodeURIComponent(this.videoUrl),
-          sharedIframe: '<iframe src="' + window.location.origin + '/#/play/wasm/' + encodeURIComponent(this.videoUrl) + '"></iframe>',
-          sharedRtmp: this.videoUrl
-        };
-      }
-    },
-    created() {
-      console.log(this.player)
-      if (Object.keys(this.player).length === 1) {
-        this.activePlayer = Object.keys(this.player)[0]
-      }
-    },
-    data() {
+export default {
+  name: 'devicePlayer',
+  props: {},
+  components: {
+    jessibucaPlayer, rtcPlayer, recordDownload,
+  },
+  computed: {
+    getPlayerShared: function () {
       return {
-        video: 'http://lndxyj.iqilu.com/public/upload/2019/10/14/8c001ea0c09cdc59a57829dabc8010fa.mp4',
-        videoUrl: '',
-        activePlayer: "jessibuca",
-        // 如何你只是用一种播放器，直接注释掉不用的部分即可
-        player: {
-          jessibuca: ["ws_flv", "wss_flv"],
-          webRTC: ["rtc", "rtc"],
-        },
-        videoHistory: {
-          date: '',
-          searchHistoryResult: [] //媒体流历史记录搜索结果
-        },
-        showVideoDialog: false,
-        streamId: '',
-        app: '',
-        mediaServerId: '',
-        convertKey: '',
-        deviceId: '',
-        channelId: '',
-        tabActiveName: 'media',
-        hasAudio: false,
-        loadingRecords: false,
-        recordsLoading: false,
-        isLoging: false,
-        controSpeed: 30,
-        timeVal: 0,
-        timeMin: 0,
-        timeMax: 1440,
-        presetPos: 1,
-        cruisingSpeed: 100,
-        cruisingTime: 5,
-        cruisingGroup: 0,
-        scanSpeed: 100,
-        scanGroup: 0,
-        tracks: [],
-        coverPlaying: false,
-        tracksLoading: false,
-        recordPlay: "",
-        showPtz: true,
-        showRrecord: true,
-        tracksNotLoaded: false,
-        sliderTime: 0,
-        seekTime: 0,
-        recordStartTime: 0,
-        showTimeText: "00:00:00",
-        streamInfo: null,
-        billCode: ''
+        sharedUrl: window.location.origin + '/#/play/wasm/' + encodeURIComponent(this.videoUrl),
+        sharedIframe: '<iframe src="' + window.location.origin + '/#/play/wasm/' + encodeURIComponent(this.videoUrl) + '"></iframe>',
+        sharedRtmp: this.videoUrl
       };
-    },
-    methods: {
-      tabHandleClick: function (tab, event) {
-        console.log(tab)
-        var that = this;
-        that.tracks = [];
-        that.tracksLoading = true;
-        that.tracksNotLoaded = false;
-        if (tab.name === "codec") {
-          this.$axios({
-            method: 'get',
-            url: '/zlm/' + this.mediaServerId + '/index/api/getMediaInfo?vhost=__defaultVhost__&schema=rtmp&app=' + this.app + '&stream=' + this.streamId
-          }).then(function (res) {
-            that.tracksLoading = false;
-            if (res.data.code == 0 && res.data.tracks) {
-              that.tracks = res.data.tracks;
-            } else {
-              that.tracksNotLoaded = true;
-              that.$message({
-                showClose: true,
-                message: '获取编码信息失败,',
-                type: 'warning'
-              });
-            }
-          }).catch(function (e) {
-          });
-        }
+    }
+  },
+  created() {
+    console.log(this.player)
+    if (Object.keys(this.player).length === 1) {
+      this.activePlayer = Object.keys(this.player)[0]
+    }
+  },
+  data() {
+    return {
+      video: 'http://lndxyj.iqilu.com/public/upload/2019/10/14/8c001ea0c09cdc59a57829dabc8010fa.mp4',
+      videoUrl: '',
+      activePlayer: "jessibuca",
+      // 如何你只是用一种播放器，直接注释掉不用的部分即可
+      player: {
+        jessibuca: ["ws_flv", "wss_flv"],
+        webRTC: ["rtc", "rtc"],
       },
-      changePlayer: function (tab) {
-        console.log(this.player[tab.name][0])
-        this.activePlayer = tab.name;
-        this.videoUrl = this.streamInfo[this.player[tab.name][0]]
-        console.log(this.videoUrl)
+      videoHistory: {
+        date: '',
+        searchHistoryResult: [] //媒体流历史记录搜索结果
       },
-      openDialog: function (tab, deviceId, channelId, param) {
-        this.tabActiveName = tab;
-        this.channelId = channelId;
-        this.deviceId = deviceId;
-        this.streamId = "";
-        this.mediaServerId = "";
-        this.app = "";
-        this.videoUrl = ""
-        if (!!this.$refs[this.activePlayer]) {
-          this.$refs[this.activePlayer].pause();
-        }
-        switch (tab) {
-          case "media":
-            this.play(param.streamInfo, param.hasAudio)
-            break;
-          case "record":
-            this.showVideoDialog = true;
-            this.videoHistory.date = param.date;
-            this.queryRecords()
-            break;
-          case "streamPlay":
-            this.tabActiveName = "media";
-            this.showRrecord = false;
-            this.showPtz = false;
-            this.play(param.streamInfo, param.hasAudio)
-            break;
-          case "control":
-            break;
-        }
-      },
-      timeAxisSelTime: function (val) {
-        console.log(val)
-      },
-      play: function (streamInfo, hasAudio) {
-        this.streamInfo = streamInfo;
-        this.hasAudio = hasAudio;
-        this.isLoging = false;
-        // this.videoUrl = streamInfo.rtc;
-        this.videoUrl = this.getUrlByStreamInfo();
-        this.streamId = streamInfo.stream;
-        this.app = streamInfo.app;
-        this.mediaServerId = streamInfo.mediaServerId;
-        this.playFromStreamInfo(false, streamInfo)
-      },
-      getUrlByStreamInfo() {
-        if (location.protocol === "https:") {
-          this.videoUrl = this.streamInfo[this.player[this.activePlayer][1]]
-        } else {
-          this.videoUrl = this.streamInfo[this.player[this.activePlayer][0]]
-        }
-        return this.videoUrl;
-
-      },
-      coverPlay: function () {
-        var that = this;
-        this.coverPlaying = true;
-        this.$refs[this.activePlayer].pause()
-        that.$axios({
-          method: 'post',
-          url: '/api/gb_record/convert/' + that.streamId
+      showVideoDialog: false,
+      streamId: '',
+      app: '',
+      mediaServerId: '',
+      convertKey: '',
+      deviceId: '',
+      channelId: '',
+      tabActiveName: 'media',
+      hasAudio: false,
+      loadingRecords: false,
+      recordsLoading: false,
+      isLoging: false,
+      controSpeed: 30,
+      timeVal: 0,
+      timeMin: 0,
+      timeMax: 1440,
+      presetPos: 1,
+      cruisingSpeed: 100,
+      cruisingTime: 5,
+      cruisingGroup: 0,
+      scanSpeed: 100,
+      scanGroup: 0,
+      tracks: [],
+      coverPlaying: false,
+      tracksLoading: false,
+      recordPlay: "",
+      showPtz: true,
+      showRrecord: true,
+      tracksNotLoaded: false,
+      sliderTime: 0,
+      seekTime: 0,
+      recordStartTime: 0,
+      showTimeText: "00:00:00",
+      streamInfo: null,
+      billCode: '',
+      listData: []
+    };
+  },
+  methods: {
+    tabHandleClick: function (tab, event) {
+      console.log(tab)
+      var that = this;
+      that.tracks = [];
+      that.tracksLoading = true;
+      that.tracksNotLoaded = false;
+      if (tab.name === "codec") {
+        this.$axios({
+          method: 'get',
+          url: '/zlm/' + this.mediaServerId + '/index/api/getMediaInfo?vhost=__defaultVhost__&schema=rtmp&app=' + this.app + '&stream=' + this.streamId
         }).then(function (res) {
-          if (res.data.code == 0) {
-            that.convertKey = res.data.key;
-            setTimeout(() => {
-              that.isLoging = false;
-              that.playFromStreamInfo(false, res.data.data);
-            }, 2000)
+          that.tracksLoading = false;
+          if (res.data.code == 0 && res.data.tracks) {
+            that.tracks = res.data.tracks;
           } else {
-            that.isLoging = false;
-            that.coverPlaying = false;
+            that.tracksNotLoaded = true;
             that.$message({
               showClose: true,
-              message: '转码失败',
-              type: 'error'
+              message: '获取编码信息失败,',
+              type: 'warning'
             });
           }
         }).catch(function (e) {
-          console.log(e)
+        });
+      }
+    },
+    changePlayer: function (tab) {
+      console.log(this.player[tab.name][0])
+      this.activePlayer = tab.name;
+      this.videoUrl = this.streamInfo[this.player[tab.name][0]]
+      console.log(this.videoUrl)
+    },
+    openDialog: function (tab, deviceId, channelId, param) {
+      this.tabActiveName = tab;
+      this.channelId = channelId;
+      this.deviceId = deviceId;
+      this.streamId = "";
+      this.mediaServerId = "";
+      this.app = "";
+      this.videoUrl = ""
+      if (!!this.$refs[this.activePlayer]) {
+        this.$refs[this.activePlayer].pause();
+      }
+      switch (tab) {
+        case "media":
+          this.play(param.streamInfo, param.hasAudio)
+          break;
+        case "record":
+          this.showVideoDialog = true;
+          this.videoHistory.date = param.date;
+          this.queryRecords()
+          break;
+        case "streamPlay":
+          this.tabActiveName = "media";
+          this.showRrecord = false;
+          this.showPtz = false;
+          this.play(param.streamInfo, param.hasAudio)
+          break;
+        case "control":
+          break;
+      }
+    },
+    timeAxisSelTime: function (val) {
+      console.log(val)
+    },
+    play: function (streamInfo, hasAudio) {
+      this.streamInfo = streamInfo;
+      this.hasAudio = hasAudio;
+      this.isLoging = false;
+      // this.videoUrl = streamInfo.rtc;
+      this.videoUrl = this.getUrlByStreamInfo();
+      this.streamId = streamInfo.stream;
+      this.app = streamInfo.app;
+      this.mediaServerId = streamInfo.mediaServerId;
+      this.playFromStreamInfo(false, streamInfo)
+    },
+    getUrlByStreamInfo() {
+      if (location.protocol === "https:") {
+        this.videoUrl = this.streamInfo[this.player[this.activePlayer][1]]
+      } else {
+        this.videoUrl = this.streamInfo[this.player[this.activePlayer][0]]
+      }
+      return this.videoUrl;
+
+    },
+    coverPlay: function () {
+      var that = this;
+      this.coverPlaying = true;
+      this.$refs[this.activePlayer].pause()
+      that.$axios({
+        method: 'post',
+        url: '/api/gb_record/convert/' + that.streamId
+      }).then(function (res) {
+        if (res.data.code == 0) {
+          that.convertKey = res.data.key;
+          setTimeout(() => {
+            that.isLoging = false;
+            that.playFromStreamInfo(false, res.data.data);
+          }, 2000)
+        } else {
+          that.isLoging = false;
           that.coverPlaying = false;
           that.$message({
             showClose: true,
-            message: '播放错误',
+            message: '转码失败',
             type: 'error'
           });
-        });
-      },
-      convertStopClick: function () {
-        this.convertStop(() => {
-          this.$refs[this.activePlayer].play(this.videoUrl)
-        });
-      },
-      convertStop: function (callback) {
-        var that = this;
-        that.$refs.videoPlayer.pause()
-        this.$axios({
-          method: 'post',
-          url: '/api/play/convertStop/' + this.convertKey
-        }).then(function (res) {
-          if (res.data.code == 0) {
-            console.log(res.data.msg)
-          } else {
-            console.error(res.data.msg)
-          }
-          if (callback) callback();
-        }).catch(function (e) {
-        });
+        }
+      }).catch(function (e) {
+        console.log(e)
         that.coverPlaying = false;
-        that.convertKey = "";
-        // if (callback )callback();
-      },
+        that.$message({
+          showClose: true,
+          message: '播放错误',
+          type: 'error'
+        });
+      });
+    },
+    convertStopClick: function () {
+      this.convertStop(() => {
+        this.$refs[this.activePlayer].play(this.videoUrl)
+      });
+    },
+    convertStop: function (callback) {
+      var that = this;
+      that.$refs.videoPlayer.pause()
+      this.$axios({
+        method: 'post',
+        url: '/api/play/convertStop/' + this.convertKey
+      }).then(function (res) {
+        if (res.data.code == 0) {
+          console.log(res.data.msg)
+        } else {
+          console.error(res.data.msg)
+        }
+        if (callback) callback();
+      }).catch(function (e) {
+      });
+      that.coverPlaying = false;
+      that.convertKey = "";
+      // if (callback )callback();
+    },
 
-      playFromStreamInfo: function (realHasAudio, streamInfo) {
-        this.showVideoDialog = true;
-        this.hasaudio = realHasAudio && this.hasaudio;
-        this.$refs[this.activePlayer].play(this.getUrlByStreamInfo(streamInfo))
-      },
-      close: function () {
-        console.log('关闭视频');
-        if (!!this.$refs[this.activePlayer]) {
-          this.$refs[this.activePlayer].pause();
-        }
-        this.videoUrl = '';
-        this.coverPlaying = false;
-        this.showVideoDialog = false;
-        if (this.convertKey != '') {
-          this.convertStop();
-        }
-        this.convertKey = ''
-        if (this.recordPlay != '') {
-          this.stopPlayRecord();
-        }
-        this.recordPlay = ''
-      },
+    playFromStreamInfo: function (realHasAudio, streamInfo) {
+      this.showVideoDialog = true;
+      this.hasaudio = realHasAudio && this.hasaudio;
+      this.$refs[this.activePlayer].play(this.getUrlByStreamInfo(streamInfo))
+    },
+    close: function () {
+      console.log('关闭视频');
+      if (!!this.$refs[this.activePlayer]) {
+        this.$refs[this.activePlayer].pause();
+      }
+      this.videoUrl = '';
+      this.coverPlaying = false;
+      this.showVideoDialog = false;
+      if (this.convertKey != '') {
+        this.convertStop();
+      }
+      this.convertKey = ''
+      if (this.recordPlay != '') {
+        this.stopPlayRecord();
+      }
+      this.recordPlay = ''
+    },
 
-      copySharedInfo: function (data) {
-        console.log('复制内容：' + data);
-        this.coverPlaying = false;
-        this.tracks = []
-        let _this = this;
-        this.$copyText(data).then(
-          function (e) {
-            _this.$message({
-              showClose: true,
-              message: '复制成功',
-              type: 'success'
-            });
-          },
-          function (e) {
-            _this.$message({
-              showClose: true,
-              message: '复制失败，请手动复制',
-              type: 'error'
-            });
-          }
-        );
-      },
-
-      queryRecords: function () {
-        if (!this.videoHistory.date) {
-          return;
+    copySharedInfo: function (data) {
+      console.log('复制内容：' + data);
+      this.coverPlaying = false;
+      this.tracks = []
+      let _this = this;
+      this.$copyText(data).then(
+        function (e) {
+          _this.$message({
+            showClose: true,
+            message: '复制成功',
+            type: 'success'
+          });
+        },
+        function (e) {
+          _this.$message({
+            showClose: true,
+            message: '复制失败，请手动复制',
+            type: 'error'
+          });
         }
-        this.recordsLoading = true;
-        this.videoHistory.searchHistoryResult = [];
-        let that = this;
-        var startTime = this.videoHistory.date + " 00:00:00";
-        var endTime = this.videoHistory.date + " 23:59:59";
+      );
+    },
+
+    queryRecords: function () {
+      if (!this.videoHistory.date) {
+        return;
+      }
+      this.recordsLoading = true;
+      this.videoHistory.searchHistoryResult = [];
+      let that = this;
+      var startTime = this.videoHistory.date + " 00:00:00";
+      var endTime = this.videoHistory.date + " 23:59:59";
+      this.$axios({
+        method: 'get',
+        url: '/api/gb_record/query/' + this.deviceId + '/' + this.channelId + '?startTime=' + startTime + '&endTime=' + endTime
+      }).then(function (res) {
+        console.log(res)
+        if (res.data.code === 0) {
+          // 处理时间信息
+          that.videoHistory.searchHistoryResult = res.data.data.recordList;
+          that.recordsLoading = false;
+        } else {
+          this.$message({
+            showClose: true,
+            message: res.data.msg,
+            type: "error",
+          });
+        }
+
+      }).catch(function (e) {
+        console.log(e.message);
+        // that.videoHistory.searchHistoryResult = falsificationData.recordData;
+      });
+
+    },
+    onTimeChange: function (video) {
+      // this.queryRecords()
+    },
+    playRecord: function (row) {
+      let that = this;
+
+      let startTime = row.startTime
+      this.recordStartTime = row.startTime
+      this.showTimeText = row.startTime.split(" ")[1]
+      let endtime = row.endTime
+      this.sliderTime = 0;
+      this.seekTime = new Date(endtime).getTime() - new Date(startTime).getTime();
+      console.log(this.seekTime)
+      if (that.streamId != "") {
+        that.stopPlayRecord(function () {
+          that.streamId = "";
+          that.playRecord(row);
+        })
+      } else {
         this.$axios({
           method: 'get',
-          url: '/api/gb_record/query/' + this.deviceId + '/' + this.channelId + '?startTime=' + startTime + '&endTime=' + endTime
+          url: '/api/playback/start/' + this.deviceId + '/' + this.channelId + '?startTime=' + row.startTime + '&endTime=' +
+            row.endTime
         }).then(function (res) {
-          console.log(res)
-          if (res.data.code === 0) {
-            // 处理时间信息
-            that.videoHistory.searchHistoryResult = res.data.data.recordList;
-            that.recordsLoading = false;
+          that.streamInfo = res.data;
+          that.app = that.streamInfo.app;
+          that.streamId = that.streamInfo.stream;
+          that.mediaServerId = that.streamInfo.mediaServerId;
+          that.ssrc = that.streamInfo.ssrc;
+          that.videoUrl = that.getUrlByStreamInfo();
+          that.recordPlay = true;
+        });
+      }
+    },
+    stopPlayRecord: function (callback) {
+      this.$refs[this.activePlayer].pause();
+      this.videoUrl = '';
+      this.$axios({
+        method: 'get',
+        url: '/api/playback/stop/' + this.deviceId + "/" + this.channelId + "/" + this.streamId
+      }).then(function (res) {
+        if (callback) callback()
+      });
+    },
+    downloadRecord: function (row) {
+      let that = this;
+      if (that.streamId != "") {
+        that.stopDownloadRecord(function (res) {
+          if (res.code == 0) {
+            that.streamId = "";
+            that.downloadRecord(row);
           } else {
             this.$message({
               showClose: true,
@@ -658,442 +742,378 @@
             });
           }
 
-        }).catch(function (e) {
-          console.log(e.message);
-          // that.videoHistory.searchHistoryResult = falsificationData.recordData;
-        });
-
-      },
-      onTimeChange: function (video) {
-        // this.queryRecords()
-      },
-      playRecord: function (row) {
-        let that = this;
-
-        let startTime = row.startTime
-        this.recordStartTime = row.startTime
-        this.showTimeText = row.startTime.split(" ")[1]
-        let endtime = row.endTime
-        this.sliderTime = 0;
-        this.seekTime = new Date(endtime).getTime() - new Date(startTime).getTime();
-        console.log(this.seekTime)
-        if (that.streamId != "") {
-          that.stopPlayRecord(function () {
-            that.streamId = "";
-            that.playRecord(row);
-          })
-        } else {
-          this.$axios({
-            method: 'get',
-            url: '/api/playback/start/' + this.deviceId + '/' + this.channelId + '?startTime=' + row.startTime + '&endTime=' +
-              row.endTime
-          }).then(function (res) {
-            that.streamInfo = res.data;
-            that.app = that.streamInfo.app;
-            that.streamId = that.streamInfo.stream;
-            that.mediaServerId = that.streamInfo.mediaServerId;
-            that.ssrc = that.streamInfo.ssrc;
-            that.videoUrl = that.getUrlByStreamInfo();
-            that.recordPlay = true;
-          });
-        }
-      },
-      stopPlayRecord: function (callback) {
-        this.$refs[this.activePlayer].pause();
-        this.videoUrl = '';
-        this.$axios({
-          method: 'get',
-          url: '/api/playback/stop/' + this.deviceId + "/" + this.channelId + "/" + this.streamId
-        }).then(function (res) {
-          if (callback) callback()
-        });
-      },
-      downloadRecord: function (row) {
-        let that = this;
-        if (that.streamId != "") {
-          that.stopDownloadRecord(function (res) {
-            if (res.code == 0) {
-              that.streamId = "";
-              that.downloadRecord(row);
-            } else {
-              this.$message({
-                showClose: true,
-                message: res.data.msg,
-                type: "error",
-              });
-            }
-
-          })
-        } else {
-          this.$axios({
-            method: 'get',
-            url: '/api/gb_record/download/start/' + this.deviceId + '/' + this.channelId + '?startTime=' + row.startTime + '&endTime=' +
-              row.endTime + '&downloadSpeed=4'
-          }).then(function (res) {
-            if (res.data.code == 0) {
-              let streamInfo = res.data.data;
-              that.recordPlay = false;
-              that.$refs.recordDownload.openDialog(that.deviceId, that.channelId, streamInfo.app, streamInfo.stream, streamInfo.mediaServerId);
-            } else {
-              that.$message({
-                showClose: true,
-                message: res.data.msg,
-                type: "error",
-              });
-            }
-          });
-        }
-      },
-      stopDownloadRecord: function (callback) {
-        this.$refs[this.activePlayer].pause();
-        this.videoUrl = '';
-        this.$axios({
-          method: 'get',
-          url: '/api/gb_record/download/stop/' + this.deviceId + "/" + this.channelId + "/" + this.streamId
-        }).then((res) => {
-          if (callback) callback(res)
-        });
-      },
-      ptzCamera: function (command) {
-        console.log('云台控制：' + command);
-        let that = this;
-        this.$axios({
-          method: 'post',
-          url: '/api/ptz/control/' + this.deviceId + '/' + this.channelId + '?command=' + command + '&horizonSpeed=' + this.controSpeed + '&verticalSpeed=' + this.controSpeed + '&zoomSpeed=' + this.controSpeed
-        }).then(function (res) {
-        });
-      },
-      //////////////////////播放器事件处理//////////////////////////
-      videoError: function (e) {
-        console.log("播放器错误：" + JSON.stringify(e));
-      },
-      presetPosition: function (cmdCode, presetPos) {
-        console.log('预置位控制：' + this.presetPos + ' : 0x' + cmdCode.toString(16));
-        let that = this;
-        this.$axios({
-          method: 'post',
-          url: '/api/ptz/front_end_command/' + this.deviceId + '/' + this.channelId + '?cmdCode=' + cmdCode + '&parameter1=0&parameter2=' + presetPos + '&combindCode2=0'
-        }).then(function (res) {
-        });
-      },
-      setSpeedOrTime: function (cmdCode, groupNum, parameter) {
-        let that = this;
-        let parameter2 = parameter % 256;
-        let combindCode2 = Math.floor(parameter / 256) * 16;
-        console.log('前端控制：0x' + cmdCode.toString(16) + ' 0x' + groupNum.toString(16) + ' 0x' + parameter2.toString(16) + ' 0x' + combindCode2.toString(16));
-        this.$axios({
-          method: 'post',
-          url: '/api/ptz/front_end_command/' + this.deviceId + '/' + this.channelId + '?cmdCode=' + cmdCode + '&parameter1=' + groupNum + '&parameter2=' + parameter2 + '&combindCode2=' + combindCode2
-        }).then(function (res) {
-        });
-      },
-      setCommand: function (cmdCode, groupNum, parameter) {
-        let that = this;
-        console.log('前端控制：0x' + cmdCode.toString(16) + ' 0x' + groupNum.toString(16) + ' 0x' + parameter.toString(16) + ' 0x0');
-        this.$axios({
-          method: 'post',
-          url: '/api/ptz/front_end_command/' + this.deviceId + '/' + this.channelId + '?cmdCode=' + cmdCode + '&parameter1=' + groupNum + '&parameter2=' + parameter + '&combindCode2=0'
-        }).then(function (res) {
-        });
-      },
-      formatTooltip: function (val) {
-        var h = parseInt(val / 60);
-        var hStr = h < 10 ? ("0" + h) : h;
-        var s = val % 60;
-        var sStr = s < 10 ? ("0" + s) : s;
-        return h + ":" + sStr;
-      },
-      timeFormatter: function (row, column, cellValue, index) {
-        return cellValue.split(" ")[1];
-      },
-      mergeTime: function (timeArray) {
-        var resultArray = [];
-        for (let i = 0; i < timeArray.length; i++) {
-          var startTime = new Date(timeArray[i].startTime);
-          var endTime = new Date(timeArray[i].endTime);
-          if (i == 0) {
-            resultArray[0] = {
-              startTime: startTime,
-              endTime: endTime
-            }
-          }
-          for (let j = 0; j < resultArray.length; j++) {
-            if (startTime > resultArray[j].endTime) { // 合并
-              if (startTime - resultArray[j].endTime <= 1000) {
-                resultArray[j].endTime = endTime;
-              } else {
-                resultArray[resultArray.length] = {
-                  startTime: startTime,
-                  endTime: endTime
-                }
-              }
-            } else if (resultArray[j].startTime > endTime) { // 合并
-              if (resultArray[j].startTime - endTime <= 1000) {
-                resultArray[j].startTime = startTime;
-              } else {
-                resultArray[resultArray.length] = {
-                  startTime: startTime,
-                  endTime: endTime
-                }
-              }
-            }
-          }
-        }
-        console.log(resultArray)
-        return resultArray;
-      },
-      copyUrl: function (dropdownItem) {
-        console.log(dropdownItem)
-        this.$copyText(dropdownItem).then((e) => {
-          this.$message.success("成功拷贝到粘贴板");
-        }, (e) => {
-
         })
-      },
-      onSubmit: function () {
-        console.log("device palyer onSubmit");
-        console.log(this.billCode);
-        console.log(this.deviceId)
-        console.log(this.channelId)
-      },
-      gbPlay() {
-        console.log('前端控制：播放');
+      } else {
         this.$axios({
           method: 'get',
-          url: '/api/playback/resume/' + this.streamId
-        }).then((res) => {
+          url: '/api/gb_record/download/start/' + this.deviceId + '/' + this.channelId + '?startTime=' + row.startTime + '&endTime=' +
+            row.endTime + '&downloadSpeed=4'
+        }).then(function (res) {
+          if (res.data.code == 0) {
+            let streamInfo = res.data.data;
+            that.recordPlay = false;
+            that.$refs.recordDownload.openDialog(that.deviceId, that.channelId, streamInfo.app, streamInfo.stream, streamInfo.mediaServerId);
+          } else {
+            that.$message({
+              showClose: true,
+              message: res.data.msg,
+              type: "error",
+            });
+          }
+        });
+      }
+    },
+    stopDownloadRecord: function (callback) {
+      this.$refs[this.activePlayer].pause();
+      this.videoUrl = '';
+      this.$axios({
+        method: 'get',
+        url: '/api/gb_record/download/stop/' + this.deviceId + "/" + this.channelId + "/" + this.streamId
+      }).then((res) => {
+        if (callback) callback(res)
+      });
+    },
+    ptzCamera: function (command) {
+      console.log('云台控制：' + command);
+      let that = this;
+      this.$axios({
+        method: 'post',
+        url: '/api/ptz/control/' + this.deviceId + '/' + this.channelId + '?command=' + command + '&horizonSpeed=' + this.controSpeed + '&verticalSpeed=' + this.controSpeed + '&zoomSpeed=' + this.controSpeed
+      }).then(function (res) {
+      });
+    },
+    //////////////////////播放器事件处理//////////////////////////
+    videoError: function (e) {
+      console.log("播放器错误：" + JSON.stringify(e));
+    },
+    presetPosition: function (cmdCode, presetPos) {
+      console.log('预置位控制：' + this.presetPos + ' : 0x' + cmdCode.toString(16));
+      let that = this;
+      this.$axios({
+        method: 'post',
+        url: '/api/ptz/front_end_command/' + this.deviceId + '/' + this.channelId + '?cmdCode=' + cmdCode + '&parameter1=0&parameter2=' + presetPos + '&combindCode2=0'
+      }).then(function (res) {
+      });
+    },
+    setSpeedOrTime: function (cmdCode, groupNum, parameter) {
+      let that = this;
+      let parameter2 = parameter % 256;
+      let combindCode2 = Math.floor(parameter / 256) * 16;
+      console.log('前端控制：0x' + cmdCode.toString(16) + ' 0x' + groupNum.toString(16) + ' 0x' + parameter2.toString(16) + ' 0x' + combindCode2.toString(16));
+      this.$axios({
+        method: 'post',
+        url: '/api/ptz/front_end_command/' + this.deviceId + '/' + this.channelId + '?cmdCode=' + cmdCode + '&parameter1=' + groupNum + '&parameter2=' + parameter2 + '&combindCode2=' + combindCode2
+      }).then(function (res) {
+      });
+    },
+    setCommand: function (cmdCode, groupNum, parameter) {
+      let that = this;
+      console.log('前端控制：0x' + cmdCode.toString(16) + ' 0x' + groupNum.toString(16) + ' 0x' + parameter.toString(16) + ' 0x0');
+      this.$axios({
+        method: 'post',
+        url: '/api/ptz/front_end_command/' + this.deviceId + '/' + this.channelId + '?cmdCode=' + cmdCode + '&parameter1=' + groupNum + '&parameter2=' + parameter + '&combindCode2=0'
+      }).then(function (res) {
+      });
+    },
+    formatTooltip: function (val) {
+      var h = parseInt(val / 60);
+      var hStr = h < 10 ? ("0" + h) : h;
+      var s = val % 60;
+      var sStr = s < 10 ? ("0" + s) : s;
+      return h + ":" + sStr;
+    },
+    timeFormatter: function (row, column, cellValue, index) {
+      return cellValue.split(" ")[1];
+    },
+    mergeTime: function (timeArray) {
+      var resultArray = [];
+      for (let i = 0; i < timeArray.length; i++) {
+        var startTime = new Date(timeArray[i].startTime);
+        var endTime = new Date(timeArray[i].endTime);
+        if (i == 0) {
+          resultArray[0] = {
+            startTime: startTime,
+            endTime: endTime
+          }
+        }
+        for (let j = 0; j < resultArray.length; j++) {
+          if (startTime > resultArray[j].endTime) { // 合并
+            if (startTime - resultArray[j].endTime <= 1000) {
+              resultArray[j].endTime = endTime;
+            } else {
+              resultArray[resultArray.length] = {
+                startTime: startTime,
+                endTime: endTime
+              }
+            }
+          } else if (resultArray[j].startTime > endTime) { // 合并
+            if (resultArray[j].startTime - endTime <= 1000) {
+              resultArray[j].startTime = startTime;
+            } else {
+              resultArray[resultArray.length] = {
+                startTime: startTime,
+                endTime: endTime
+              }
+            }
+          }
+        }
+      }
+      console.log(resultArray)
+      return resultArray;
+    },
+    copyUrl: function (dropdownItem) {
+      console.log(dropdownItem)
+      this.$copyText(dropdownItem).then((e) => {
+        this.$message.success("成功拷贝到粘贴板");
+      }, (e) => {
+
+      })
+    },
+    onSubmit: function () {
+      console.log("device palyer onSubmit");
+      console.log(this.billCode);
+      console.log(this.deviceId)
+      console.log(this.channelId)
+      this.listData = JSON.parse('[{"info":"网点1","scanTime":"2022-08-19 16:00:00"},{"info":"网点2","scanTime":"2022-08-19 16:00:00"},{"info":"网点3","scanTime":"2022-08-19 16:00:00"}]')
+    },
+    gbPlay() {
+      console.log('前端控制：播放');
+      this.$axios({
+        method: 'get',
+        url: '/api/playback/resume/' + this.streamId
+      }).then((res) => {
+        this.$refs[this.activePlayer].play(this.videoUrl)
+      });
+    },
+    gbPause() {
+      console.log('前端控制：暂停');
+      this.$axios({
+        method: 'get',
+        url: '/api/playback/pause/' + this.streamId
+      }).then(function (res) {
+      });
+    },
+    gbScale(command) {
+      console.log('前端控制：倍速 ' + command);
+      this.$axios({
+        method: 'get',
+        url: `/api/playback/speed/${this.streamId}/${command}`
+      }).then(function (res) {
+      });
+    },
+    gbSeek(val) {
+      console.log('前端控制：seek ');
+      console.log(this.seekTime);
+      console.log(this.sliderTime);
+      let showTime = new Date(new Date(this.recordStartTime).getTime() + this.seekTime * val / 100)
+      let hour = showTime.getHours();
+      let minutes = showTime.getMinutes();
+      let seconds = showTime.getSeconds();
+      this.showTimeText = (hour < 10 ? ("0" + hour) : hour) + ":" + (minutes < 10 ? ("0" + minutes) : minutes) + ":" + (seconds < 10 ? ("0" + seconds) : seconds)
+      this.$axios({
+        method: 'get',
+        url: `/api/playback/seek/${this.streamId}/` + Math.floor(this.seekTime * val / 100000)
+      }).then((res) => {
+        setTimeout(() => {
           this.$refs[this.activePlayer].play(this.videoUrl)
-        });
-      },
-      gbPause() {
-        console.log('前端控制：暂停');
-        this.$axios({
-          method: 'get',
-          url: '/api/playback/pause/' + this.streamId
-        }).then(function (res) {
-        });
-      },
-      gbScale(command) {
-        console.log('前端控制：倍速 ' + command);
-        this.$axios({
-          method: 'get',
-          url: `/api/playback/speed/${this.streamId}/${command}`
-        }).then(function (res) {
-        });
-      },
-      gbSeek(val) {
-        console.log('前端控制：seek ');
-        console.log(this.seekTime);
-        console.log(this.sliderTime);
-        let showTime = new Date(new Date(this.recordStartTime).getTime() + this.seekTime * val / 100)
-        let hour = showTime.getHours();
-        let minutes = showTime.getMinutes();
-        let seconds = showTime.getSeconds();
-        this.showTimeText = (hour < 10 ? ("0" + hour) : hour) + ":" + (minutes < 10 ? ("0" + minutes) : minutes) + ":" + (seconds < 10 ? ("0" + seconds) : seconds)
-        this.$axios({
-          method: 'get',
-          url: `/api/playback/seek/${this.streamId}/` + Math.floor(this.seekTime * val / 100000)
-        }).then((res) => {
-          setTimeout(() => {
-            this.$refs[this.activePlayer].play(this.videoUrl)
-          }, 600)
-        });
-      },
+        }, 600)
+      });
+    },
 
 
-    }
-  };
+  }
+};
 </script>
 
 <style>
-  .control-wrapper {
-    position: relative;
-    width: 6.25rem;
-    height: 6.25rem;
-    max-width: 6.25rem;
-    max-height: 6.25rem;
-    border-radius: 100%;
-    margin-top: 1.5rem;
-    margin-left: 0.5rem;
-    float: left;
-  }
+.control-wrapper {
+  position: relative;
+  width: 6.25rem;
+  height: 6.25rem;
+  max-width: 6.25rem;
+  max-height: 6.25rem;
+  border-radius: 100%;
+  margin-top: 1.5rem;
+  margin-left: 0.5rem;
+  float: left;
+}
 
-  .control-panel {
-    position: relative;
-    top: 0;
-    left: 5rem;
-    height: 11rem;
-    max-height: 11rem;
-  }
+.control-panel {
+  position: relative;
+  top: 0;
+  left: 5rem;
+  height: 11rem;
+  max-height: 11rem;
+}
 
-  .control-btn {
-    display: flex;
-    justify-content: center;
-    position: absolute;
-    width: 44%;
-    height: 44%;
-    border-radius: 5px;
-    border: 1px solid #78aee4;
-    box-sizing: border-box;
-    transition: all 0.3s linear;
-  }
+.control-btn {
+  display: flex;
+  justify-content: center;
+  position: absolute;
+  width: 44%;
+  height: 44%;
+  border-radius: 5px;
+  border: 1px solid #78aee4;
+  box-sizing: border-box;
+  transition: all 0.3s linear;
+}
 
-  .control-btn:hover {
-    cursor: pointer
-  }
+.control-btn:hover {
+  cursor: pointer
+}
 
-  .control-btn i {
-    font-size: 20px;
-    color: #78aee4;
-    display: flex;
-    justify-content: center;
-    align-items: center;
-  }
+.control-btn i {
+  font-size: 20px;
+  color: #78aee4;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
 
-  .control-btn i:hover {
-    cursor: pointer
-  }
+.control-btn i:hover {
+  cursor: pointer
+}
 
-  .control-zoom-btn:hover {
-    cursor: pointer
-  }
+.control-zoom-btn:hover {
+  cursor: pointer
+}
 
-  .control-round {
-    position: absolute;
-    top: 21%;
-    left: 21%;
-    width: 58%;
-    height: 58%;
-    background: #fff;
-    border-radius: 100%;
-  }
+.control-round {
+  position: absolute;
+  top: 21%;
+  left: 21%;
+  width: 58%;
+  height: 58%;
+  background: #fff;
+  border-radius: 100%;
+}
 
-  .control-round-inner {
-    position: absolute;
-    left: 13%;
-    top: 13%;
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    width: 70%;
-    height: 70%;
-    font-size: 40px;
-    color: #78aee4;
-    border: 1px solid #78aee4;
-    border-radius: 100%;
-    transition: all 0.3s linear;
-  }
+.control-round-inner {
+  position: absolute;
+  left: 13%;
+  top: 13%;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  width: 70%;
+  height: 70%;
+  font-size: 40px;
+  color: #78aee4;
+  border: 1px solid #78aee4;
+  border-radius: 100%;
+  transition: all 0.3s linear;
+}
 
-  .control-inner-btn {
-    position: absolute;
-    width: 60%;
-    height: 60%;
-    background: #fafafa;
-  }
+.control-inner-btn {
+  position: absolute;
+  width: 60%;
+  height: 60%;
+  background: #fafafa;
+}
 
-  .control-top {
-    top: -8%;
-    left: 27%;
-    transform: rotate(-45deg);
-    border-radius: 5px 100% 5px 0;
-  }
+.control-top {
+  top: -8%;
+  left: 27%;
+  transform: rotate(-45deg);
+  border-radius: 5px 100% 5px 0;
+}
 
-  .control-top i {
-    transform: rotate(45deg);
-    border-radius: 5px 100% 5px 0;
-  }
+.control-top i {
+  transform: rotate(45deg);
+  border-radius: 5px 100% 5px 0;
+}
 
-  .control-top .control-inner {
-    left: -1px;
-    bottom: 0;
-    border-top: 1px solid #78aee4;
-    border-right: 1px solid #78aee4;
-    border-radius: 0 100% 0 0;
-  }
+.control-top .control-inner {
+  left: -1px;
+  bottom: 0;
+  border-top: 1px solid #78aee4;
+  border-right: 1px solid #78aee4;
+  border-radius: 0 100% 0 0;
+}
 
-  .control-top .fa {
-    transform: rotate(45deg) translateY(-7px);
-  }
+.control-top .fa {
+  transform: rotate(45deg) translateY(-7px);
+}
 
-  .control-left {
-    top: 27%;
-    left: -8%;
-    transform: rotate(45deg);
-    border-radius: 5px 0 5px 100%;
-  }
+.control-left {
+  top: 27%;
+  left: -8%;
+  transform: rotate(45deg);
+  border-radius: 5px 0 5px 100%;
+}
 
-  .control-left i {
-    transform: rotate(-45deg);
-  }
+.control-left i {
+  transform: rotate(-45deg);
+}
 
-  .control-left .control-inner {
-    right: -1px;
-    top: -1px;
-    border-bottom: 1px solid #78aee4;
-    border-left: 1px solid #78aee4;
-    border-radius: 0 0 0 100%;
-  }
+.control-left .control-inner {
+  right: -1px;
+  top: -1px;
+  border-bottom: 1px solid #78aee4;
+  border-left: 1px solid #78aee4;
+  border-radius: 0 0 0 100%;
+}
 
-  .control-left .fa {
-    transform: rotate(-45deg) translateX(-7px);
-  }
+.control-left .fa {
+  transform: rotate(-45deg) translateX(-7px);
+}
 
-  .control-right {
-    top: 27%;
-    right: -8%;
-    transform: rotate(45deg);
-    border-radius: 5px 100% 5px 0;
-  }
+.control-right {
+  top: 27%;
+  right: -8%;
+  transform: rotate(45deg);
+  border-radius: 5px 100% 5px 0;
+}
 
-  .control-right i {
-    transform: rotate(-45deg);
-  }
+.control-right i {
+  transform: rotate(-45deg);
+}
 
-  .control-right .control-inner {
-    left: -1px;
-    bottom: -1px;
-    border-top: 1px solid #78aee4;
-    border-right: 1px solid #78aee4;
-    border-radius: 0 100% 0 0;
-  }
+.control-right .control-inner {
+  left: -1px;
+  bottom: -1px;
+  border-top: 1px solid #78aee4;
+  border-right: 1px solid #78aee4;
+  border-radius: 0 100% 0 0;
+}
 
-  .control-right .fa {
-    transform: rotate(-45deg) translateX(7px);
-  }
+.control-right .fa {
+  transform: rotate(-45deg) translateX(7px);
+}
 
-  .control-bottom {
-    left: 27%;
-    bottom: -8%;
-    transform: rotate(45deg);
-    border-radius: 0 5px 100% 5px;
-  }
+.control-bottom {
+  left: 27%;
+  bottom: -8%;
+  transform: rotate(45deg);
+  border-radius: 0 5px 100% 5px;
+}
 
-  .control-bottom i {
-    transform: rotate(-45deg);
-  }
+.control-bottom i {
+  transform: rotate(-45deg);
+}
 
-  .control-bottom .control-inner {
-    top: -1px;
-    left: -1px;
-    border-bottom: 1px solid #78aee4;
-    border-right: 1px solid #78aee4;
-    border-radius: 0 0 100% 0;
-  }
+.control-bottom .control-inner {
+  top: -1px;
+  left: -1px;
+  border-bottom: 1px solid #78aee4;
+  border-right: 1px solid #78aee4;
+  border-radius: 0 0 100% 0;
+}
 
-  .control-bottom .fa {
-    transform: rotate(-45deg) translateY(7px);
-  }
+.control-bottom .fa {
+  transform: rotate(-45deg) translateY(7px);
+}
 
-  .trank {
-    width: 80%;
-    height: 180px;
-    text-align: left;
-    padding: 0 10%;
-    overflow: auto;
-  }
+.trank {
+  width: 80%;
+  height: 180px;
+  text-align: left;
+  padding: 0 10%;
+  overflow: auto;
+}
 
-  .trankInfo {
-    width: 80%;
-    padding: 0 10%;
-  }
+.trankInfo {
+  width: 80%;
+  padding: 0 10%;
+}
 </style>
