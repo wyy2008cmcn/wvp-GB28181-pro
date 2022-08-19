@@ -177,7 +177,7 @@
                     <el-col :span="2">
                       {{data.info}}
                     </el-col>
-                    <el-col :span="6" @click="onSubmit">
+                    <el-col :span="6" @click="byBillCodePlay">
                       {{data.scanTime}}
                     </el-col>
                   </el-row>
