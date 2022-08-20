@@ -176,7 +176,9 @@
                   <el-collapse accordion>
                     <el-collapse-item v-for="data in listData" :key="data.billCode" :title="data.billCode" :name="data.billCode">
                       <div v-for="(tracklog, index) in data.tracklog" :key="'button' + index" style="margin-bottom: 10px; text-align: left">
-                        <el-button type="primary" size="mini" plain @click="byBillCodePlay(data.billCode, $event)">{{ tracklog.info }}： {{ tracklog.scanTime }}</el-button>
+                        <el-button type="primary" size="mini" plain @click="byBillCodePlay(tracklog)">
+                          {{ tracklog.info }}： {{ tracklog.scanTime }}
+                        </el-button>
                       </div>
                     </el-collapse-item>
                   </el-collapse>
@@ -381,6 +383,7 @@
 </template>
 
 <script>
+import dayjs from 'dayjs'
 import rtcPlayer from '../dialog/rtcPlayer.vue'
 // import LivePlayer from '@liveqing/liveplayer'
 // import player from '../dialog/easyPlayer.vue'
@@ -869,26 +872,34 @@ export default {
       })
     },
     onSubmit: function () {
+      if (!this.billCode.length || /^\s+$/.test(this.billCode)) {
+        this.$message.warning('请先填写单号')
+        return
+      }
       console.log("device palyer onSubmit");
-      console.log(this.billCode);
-      console.log(this.deviceId)
-      console.log(this.channelId)
+      // console.log(this.billCode);
+      // console.log(this.deviceId)
+      // console.log(this.channelId)
 
       this.$axios({
         method: 'get',
         url: '/api/playback/byBillCode/' + this.billCode + '/' + this.deviceId + "/" + this.channelId
       }).then((res) => {
-        console.log(res)
-        this.listData = res;
+        console.log('byBillCode', res)
+        this.listData = res.data||[];
+      }, (err) => {
+        console.log('------err', err)
+        this.$message.error(err.msg || err.message || '单号有误，请检查单号是否正确')
       });
 
     },
-    byBillCodePlay: function (billCode, event) {
-      console.log(billCode)
-      console.info(event)
-      var row;
-      row.startTime = "2022-08-18 20:00:00";
-      row.endTime = "2022-08-18 21:00:00";
+    byBillCodePlay: function (item) {
+      console.log(item)
+      var row = {
+        startTime: item.scanTime,
+        endTime: dayjs(dayjs(item.scanTime).add(30, 'm')).format('YYYY-MM-DD HH:mm:ss')
+      }
+
       this.playRecord(row);
     },
     gbPlay() {

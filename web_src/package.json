@@ -12,6 +12,7 @@
   "dependencies": {
     "axios": "^0.24.0",
     "core-js": "^2.6.5",
+    "dayjs": "^1.11.5",
     "echarts": "^4.9.0",
     "element-ui": "^2.15.6",
     "fingerprintjs2": "^2.1.2",
