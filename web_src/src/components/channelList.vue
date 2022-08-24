@@ -4,7 +4,7 @@
       <div class="page-title">
         <el-button icon="el-icon-back" size="mini" style="font-size: 20px; color: #000;" type="text" @click="showDevice" ></el-button>
         <el-divider direction="vertical"></el-divider>
-        通道列表
+        摄像头列表
       </div>
       <div class="page-header-btn">
         <div v-if="!showTree" style="display: inline;">
