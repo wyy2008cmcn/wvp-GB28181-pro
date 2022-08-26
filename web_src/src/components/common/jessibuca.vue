@@ -180,7 +180,7 @@ export default {
 
       jessibuca.on('start', function () {
         jessibuca.setRotate(0);
-        console.log('------start', jessibuca);
+        console.log('start', jessibuca);
       })
 
       jessibuca.on("performance", function (performance) {
