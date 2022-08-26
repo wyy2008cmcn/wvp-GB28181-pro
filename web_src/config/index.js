@@ -12,14 +12,14 @@ module.exports = {
     assetsPublicPath: '/',
     proxyTable: {
       '/debug': {
-        target: 'http://39.106.16.238:18080',
+        target: 'http://36.26.10.190:18080',
         changeOrigin: true,
         pathRewrite: {
           '^/debug': '/'
         }
       },
       '/static/snap': {
-        target: 'http://39.106.16.238:18080',
+        target: 'http://36.26.10.190:18080',
         changeOrigin: true,
         // pathRewrite: {
         //   '^/static/snap': '/static/snap'

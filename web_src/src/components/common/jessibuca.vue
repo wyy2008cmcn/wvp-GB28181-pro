@@ -115,6 +115,7 @@ export default {
           vod: this.vod,
           forceNoOffscreen: this.forceNoOffscreen,
           isNotMute: this.isNotMute,
+          rotate: 180
         },
         options
       ));
@@ -178,7 +179,8 @@ export default {
       });
 
       jessibuca.on('start', function () {
-        console.log('start');
+        jessibuca.setRotate(0);
+        console.log('start', jessibuca);
       })
 
       jessibuca.on("performance", function (performance) {
