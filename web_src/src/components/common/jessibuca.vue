@@ -1,6 +1,6 @@
 <template>
   <div ref="container" @dblclick="fullscreenSwich" style="width:100%;height:100%;background-color: #000000;margin:0 auto;">
-    <div class="buttons-box" id="buttonsBox">
+    <!-- <div class="buttons-box" id="buttonsBox">
       <div class="buttons-box-left">
         <i v-if="!playing" class="iconfont icon-play jessibuca-btn" @click="playBtnClick"></i>
         <i v-if="playing" class="iconfont icon-pause jessibuca-btn" @click="pause"></i>
@@ -10,15 +10,13 @@
       </div>
       <div class="buttons-box-right">
         <span class="jessibuca-btn">{{ kBps }} kb/s</span>
-        <!--          <i class="iconfont icon-file-record1 jessibuca-btn"></i>-->
-        <!--          <i class="iconfont icon-xiangqing2 jessibuca-btn" ></i>-->
         <i class="iconfont icon-camera1196054easyiconnet jessibuca-btn" @click="screenshot"
            style="font-size: 1rem !important"></i>
         <i class="iconfont icon-shuaxin11 jessibuca-btn" @click="playBtnClick"></i>
         <i v-if="!fullscreen" class="iconfont icon-weibiaoti10 jessibuca-btn" @click="fullscreenSwich"></i>
         <i v-if="fullscreen" class="iconfont icon-weibiaoti11 jessibuca-btn" @click="fullscreenSwich"></i>
       </div>
-    </div>
+    </div> -->
   </div>
 </template>
 
@@ -93,12 +91,12 @@ export default {
       let options = {};
       console.log("hasAudio  " + this.hasAudio)
 
-      jessibucaPlayer[this._uid] = new window.Jessibuca(Object.assign(
+      jessibucaPlayer[this._uid] = new window.JessibucaPro(Object.assign(
         {
           container: this.$refs.container,
           videoBuffer: 0.2, // 最大缓冲时长，单位秒
           isResize: false,
-          decoder: "static/js/jessibuca-v3/decoder.js",
+          decoder: "static/js/jessibuca-pro/decoder-pro.js",
           useMSE: false,
           showBandwidth: false,
           // isFlv: true,
@@ -109,11 +107,11 @@ export default {
           debug: false,
           supportDblclickFullscreen: false, // 是否支持屏幕的双击事件，触发全屏，取消全屏事件。
           operateBtns: {
-            fullscreen: false,
-            screenshot: false,
-            play: false,
-            audio: false,
-            recorder: false,
+            fullscreen: true,
+            screenshot: true,
+            play: true,
+            audio: true,
+            recorder: true,
           },
           record: "record",
           vod: this.vod,
@@ -230,7 +228,7 @@ export default {
       jessibucaPlayer[this._uid].on("play", () => {
         this.playing = true;
         this.loaded = true;
-        this.quieting = jessibuca.quieting;
+        this.quieting = jessibucaPlayer[this._uid].quieting;
       });
       if (jessibucaPlayer[this._uid].hasLoaded()) {
         jessibucaPlayer[this._uid].play(url);
@@ -263,9 +261,9 @@ export default {
       if (jessibucaPlayer[this._uid]) {
         jessibucaPlayer[this._uid].destroy();
       }
-      if (document.getElementById("buttonsBox") == null) {
-        this.$refs.container.appendChild(this.btnDom)
-      }
+      // if (document.getElementById("buttonsBox") == null) {
+      //   this.$refs.container.appendChild(this.btnDom)
+      // }
       jessibucaPlayer[this._uid] = null;
       this.playing = false;
       this.err = "";
