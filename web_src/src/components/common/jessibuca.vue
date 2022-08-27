@@ -42,6 +42,7 @@ export default {
       rotate: 0,
       vod: true, // 点播
       forceNoOffscreen: false,
+      flvPlayer: null
     };
   },
   props: ['videoUrl', 'error', 'hasAudio', 'height'],

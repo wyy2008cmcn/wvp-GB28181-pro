@@ -18,9 +18,12 @@ import media from '../components/setting/Media.vue'
 import live from '../components/live.vue'
 import deviceTree from '../components/common/DeviceTree.vue'
 import userManager from '../components/UserManager.vue'
+// 新页面
+import NewPage from '../components/NewPage.vue'
 
 import wasmPlayer from '../components/common/jessibuca.vue'
 import rtcPlayer from '../components/dialog/rtcPlayer.vue'
+
 
 const originalPush = VueRouter.prototype.push
 VueRouter.prototype.push = function push(location) {
@@ -108,8 +111,13 @@ export default new VueRouter({
           path: '/userManager',
           name: 'userManager',
           component: userManager,
+        },
+        {
+          path: '/newpage',
+          name: 'NewPage',
+          component: NewPage
         }
-        ]
+      ]
     },
     {
       path: '/login',
