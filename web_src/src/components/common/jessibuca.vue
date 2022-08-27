@@ -12,7 +12,7 @@
         <span class="jessibuca-btn">{{ kBps }} kb/s</span>
         <!--          <i class="iconfont icon-file-record1 jessibuca-btn"></i>-->
         <!--          <i class="iconfont icon-xiangqing2 jessibuca-btn" ></i>-->
-        <i class="iconfont icon-camera1196054easyiconnet jessibuca-btn" @click="jessibuca.screenshot('截图','png',0.5)"
+        <i class="iconfont icon-camera1196054easyiconnet jessibuca-btn" @click="screenshot"
            style="font-size: 1rem !important"></i>
         <i class="iconfont icon-shuaxin11 jessibuca-btn" @click="playBtnClick"></i>
         <i v-if="!fullscreen" class="iconfont icon-weibiaoti10 jessibuca-btn" @click="fullscreenSwich"></i>
@@ -23,7 +23,7 @@
 </template>
 
 <script>
-let jessibucaPlayer = {};
+let jessibucaPlayer = window.jessibucaPlayer = {};
 export default {
   name: 'jessibuca',
   data() {
@@ -72,6 +72,9 @@ export default {
     immediate: true
   },
   methods: {
+    screenshot() {
+      if (jessibucaPlayer[this._uid]) jessibucaPlayer[this._uid].screenshot('截图','png',0.5)
+    },
     updatePlayerDomSize() {
       let dom = this.$refs.container;
       let width = dom.parentNode.clientWidth
@@ -94,15 +97,15 @@ export default {
         {
           container: this.$refs.container,
           videoBuffer: 0.2, // 最大缓冲时长，单位秒
-          isResize: true,
-          decoder: "static/js/jessibuca/decoder.js",
+          isResize: false,
+          decoder: "static/js/jessibuca-v3/decoder.js",
           useMSE: false,
           showBandwidth: false,
-          isFlv: true,
+          // isFlv: true,
           // text: "WVP-PRO",
           // background: "static/images/zlm-logo.png",
           loadingText: "加载中",
-          hasAudio: typeof (this.hasAudio) == "undefined" ? true : this.hasAudio,
+          // hasAudio: typeof (this.hasAudio) == "undefined" ? true : this.hasAudio,
           debug: false,
           supportDblclickFullscreen: false, // 是否支持屏幕的双击事件，触发全屏，取消全屏事件。
           operateBtns: {
@@ -115,8 +118,7 @@ export default {
           record: "record",
           vod: this.vod,
           forceNoOffscreen: this.forceNoOffscreen,
-          isNotMute: this.isNotMute,
-          rotate: 180
+          isNotMute: this.isNotMute
         },
         options
       ));
@@ -180,8 +182,7 @@ export default {
       });
 
       jessibuca.on('start', function () {
-        jessibuca.setRotate(0);
-        console.log('start', jessibuca);
+        console.log('start');
       })
 
       jessibuca.on("performance", function (performance) {

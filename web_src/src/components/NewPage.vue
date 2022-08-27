@@ -107,6 +107,16 @@ export default {
         that.loading = false;
       });
     },
+    stopPlayRecord: function (callback) {
+      this.$refs.jessibuca.pause();
+      this.videoUrl = '';
+      this.$axios({
+        method: 'get',
+        url: '/api/playback/stop/' + this.deviceId + "/" + this.channelId + "/" + this.streamId
+      }).then(function (res) {
+        if (callback) callback()
+      });
+    },
     handleItemClick(row, index) {
       this.activeIndex = index
       let that = this;
@@ -121,7 +131,7 @@ export default {
       if (that.streamId != "") {
         that.stopPlayRecord(function () {
           that.streamId = "";
-          that.playRecord(row);
+          that.handleItemClick(row, index);
         })
       } else {
         const param = {
