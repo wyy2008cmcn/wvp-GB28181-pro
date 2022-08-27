@@ -1,5 +1,5 @@
 <template>
-  <div ref="container" class="container" :class="isAmd ? 'isamd' : ''" @dblclick="fullscreenSwich" style="width:100%;height:100%;background-color: #000000;margin:0 auto;">
+  <div ref="container" class="container" :class="isAmd ? '' : 'isamd'" @dblclick="fullscreenSwich" style="width:100%;height:100%;background-color: #000000;margin:0 auto;">
     <!-- <div class="buttons-box" id="buttonsBox">
       <div class="buttons-box-left">
         <i v-if="!playing" class="iconfont icon-play jessibuca-btn" @click="playBtnClick"></i>
@@ -105,7 +105,7 @@ export default {
         {
           container: this.$refs.container,
           videoBuffer: 0.2, // 最大缓冲时长，单位秒
-          isResize: false,
+          isResize: true,
           decoder: "static/js/jessibuca-v3/decoder.js",
           useMSE: false,
           showBandwidth: false,
@@ -147,6 +147,15 @@ export default {
       });
       jessibuca.on("play", function () {
         _this.playing = true;
+        const canvas = _this.$refs.container.querySelector('canvas')
+        const div = document.createElement('div')
+        div.appendChild(canvas)
+        div.className = 'video-box'
+        div.style.width = '100%'
+        div.style.height = 'calc(100% - 38px)'
+        _this.$refs.container.appendChild(div)
+        // _this.$refs.container.removeChild(canvas)
+        console.log('------canvas', canvas && canvas.style && canvas.style.transform)
       });
       jessibuca.on("fullscreen", function (msg) {
         console.log("on fullscreen", msg);
@@ -339,7 +348,7 @@ export default {
   right: 0;
 } */
 
-.container.isamd canvas{
-  transform: rotateX(180deg)!important;
+.container.isamd .video-box{
+  transform: rotateX(180deg);
 }
 </style>
