@@ -1,5 +1,5 @@
 <template>
-  <div ref="container" @dblclick="fullscreenSwich" style="width:100%;height:100%;background-color: #000000;margin:0 auto;">
+  <div ref="container" class="container" :class="isAmd ? 'isamd' : ''" @dblclick="fullscreenSwich" style="width:100%;height:100%;background-color: #000000;margin:0 auto;">
     <!-- <div class="buttons-box" id="buttonsBox">
       <div class="buttons-box-left">
         <i v-if="!playing" class="iconfont icon-play jessibuca-btn" @click="playBtnClick"></i>
@@ -69,6 +69,15 @@ export default {
     },
     immediate: true
   },
+  computed: {
+    isAmd() {
+      var canvas = document.createElement('canvas'),
+      gl = canvas.getContext('experimental-webgl'),
+      debugInfo = gl.getExtension('WEBGL_debug_renderer_info'),
+      gpuInfo = gl.getParameter(debugInfo.UNMASKED_RENDERER_WEBGL);
+      return /Vulkan/.test(gpuInfo)
+    }
+  },
   methods: {
     screenshot() {
       if (jessibucaPlayer[this._uid]) jessibucaPlayer[this._uid].screenshot('截图','png',0.5)
@@ -86,17 +95,18 @@ export default {
 
       dom.style.width = width + 'px';
       dom.style.height = height + "px";
+      // canvas.style.transform = `${canvas.style.transform}`
     },
     create() {
       let options = {};
       console.log("hasAudio  " + this.hasAudio)
 
-      jessibucaPlayer[this._uid] = new window.JessibucaPro(Object.assign(
+      jessibucaPlayer[this._uid] = new window.Jessibuca(Object.assign(
         {
           container: this.$refs.container,
           videoBuffer: 0.2, // 最大缓冲时长，单位秒
           isResize: false,
-          decoder: "static/js/jessibuca-pro/decoder-pro.js",
+          decoder: "static/js/jessibuca-v3/decoder.js",
           useMSE: false,
           showBandwidth: false,
           // isFlv: true,
@@ -299,7 +309,7 @@ export default {
 </script>
 
 <style>
-.buttons-box {
+/* .buttons-box {
   width: 100%;
   height: 28px;
   background-color: rgba(43, 51, 63, 0.7);
@@ -327,5 +337,9 @@ export default {
 .buttons-box-right {
   position: absolute;
   right: 0;
+} */
+
+.container.isamd canvas{
+  transform: rotateX(180deg)!important;
 }
 </style>
