@@ -1,5 +1,5 @@
 <template>
-  <div ref="container" class="container" :class="isAmd ? 'isamd' : ''" @dblclick="fullscreenSwich" style="width:100%;height:100%;background-color: #000000;margin:0 auto;">
+  <div ref="container" class="container" :class="isAmd ? '' : 'isamd'" @dblclick="fullscreenSwich" style="width:100%;height:100%;background-color: #000000;margin:0 auto;">
     <!-- <div class="buttons-box" id="buttonsBox">
       <div class="buttons-box-left">
         <i v-if="!playing" class="iconfont icon-play jessibuca-btn" @click="playBtnClick"></i>
@@ -101,19 +101,20 @@ export default {
       let options = {};
       console.log("hasAudio  " + this.hasAudio)
 
-      jessibucaPlayer[this._uid] = new window.Jessibuca(Object.assign(
+      jessibucaPlayer[this._uid] = new window.JessibucaPro(Object.assign(
         {
           container: this.$refs.container,
-          videoBuffer: 0.2, // 最大缓冲时长，单位秒
+          videoBuffer: 3, // 最大缓冲时长，单位秒
           isResize: true,
-          decoder: "static/js/jessibuca-v3/decoder.js",
-          useMSE: false,
+          decoder: "static/js/jessibuca-pro/decoder-pro.js",
           showBandwidth: false,
-          // isFlv: true,
+          isFlv: true,
+          useMSE:false,
+          autoWasm:true,
           // text: "WVP-PRO",
           // background: "static/images/zlm-logo.png",
           loadingText: "加载中",
-          // hasAudio: typeof (this.hasAudio) == "undefined" ? true : this.hasAudio,
+          hasAudio: typeof (this.hasAudio) == "undefined" ? true : this.hasAudio,
           debug: false,
           supportDblclickFullscreen: false, // 是否支持屏幕的双击事件，触发全屏，取消全屏事件。
           operateBtns: {
@@ -126,7 +127,8 @@ export default {
           record: "record",
           vod: this.vod,
           forceNoOffscreen: this.forceNoOffscreen,
-          isNotMute: this.isNotMute
+          isNotMute: this.isNotMute,
+          rotate: this.isAmd ? "1,0,0,180deg" : '' // 改写了源码，rotate接收 rotate3d属性参数
         },
         options
       ));
@@ -148,13 +150,8 @@ export default {
       jessibuca.on("play", function () {
         _this.playing = true;
         const canvas = _this.$refs.container.querySelector('canvas')
-        const div = document.createElement('div')
-        div.appendChild(canvas)
-        div.className = 'video-box'
-        div.style.width = '100%'
-        div.style.height = 'calc(100% - 38px)'
-        _this.$refs.container.appendChild(div)
-        // _this.$refs.container.removeChild(canvas)
+        // const videoBox = _this.$refs.container.querySelector('.video-box')
+        
         console.log('------canvas', canvas && canvas.style && canvas.style.transform)
       });
       jessibuca.on("fullscreen", function (msg) {
@@ -196,6 +193,7 @@ export default {
 
       jessibuca.on("timeout", function () {
         console.log("timeout");
+        this.destroy()
       });
 
       jessibuca.on('start', function () {
@@ -210,6 +208,7 @@ export default {
           show = "流畅";
         }
         _this.performance = show;
+        console.log('------performance', show)
       });
       jessibuca.on('buffer', function (buffer) {
         // console.log('buffer', buffer);
@@ -260,7 +259,7 @@ export default {
     },
     pause: function () {
       if (jessibucaPlayer[this._uid]) {
-        jessibucaPlayer[this._uid].pause();
+        jessibucaPlayer[this._uid].pause && jessibucaPlayer[this._uid].pause();
       }
       this.playing = false;
       this.err = "";
@@ -348,7 +347,7 @@ export default {
   right: 0;
 } */
 
-.container.isamd .video-box{
+/* .container.isamd .video-box{
   transform: rotateX(180deg);
-}
+} */
 </style>

@@ -50,7 +50,7 @@ import jessibucaPlayer from './common/jessibuca.vue'
 export default {
   components: {
     jessibucaPlayer
-  },
+},
   data() {
     return {
       loading: false,
