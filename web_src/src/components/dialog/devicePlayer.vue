@@ -610,7 +610,7 @@ export default {
     playFromStreamInfo: function (realHasAudio, streamInfo) {
       this.showVideoDialog = true;
       this.hasaudio = realHasAudio && this.hasaudio;
-      this.$refs[this.activePlayer].play(this.getUrlByStreamInfo(streamInfo))
+      this.$refs[this.activePlayer] && this.$refs[this.activePlayer].play(this.getUrlByStreamInfo(streamInfo))
     },
     close: function () {
       console.log('关闭视频');
