@@ -106,11 +106,10 @@ export default {
           container: this.$refs.container,
           videoBuffer: 1, // 最大缓冲时长，单位秒
           isResize: true,
-          decoder: "static/js/jessibuca-pro/decoder-pro.js",
-          showBandwidth: false,
+          decoder: "static/js/jessibuca-pro/decoder-pro-simd.js",
+          showBandwidth: true,
           isFlv: true,
           useMSE:false,
-          autoWasm:true,
           // text: "WVP-PRO",
           // background: "static/images/zlm-logo.png",
           loadingText: "加载中",
@@ -134,16 +133,16 @@ export default {
       ));
       let jessibuca = jessibucaPlayer[this._uid];
       let _this = this;
-      jessibuca.on("load", function () {
-        console.log("on load init");
-      });
+      // jessibuca.on("load", function () {
+      //   console.log("on load init");
+      // });
 
-      jessibuca.on("log", function (msg) {
-        console.log("on log", msg);
-      });
-      jessibuca.on("record", function (msg) {
-        console.log("on record:", msg);
-      });
+      // jessibuca.on("log", function (msg) {
+      //   console.log("on log", msg);
+      // });
+      // jessibuca.on("record", function (msg) {
+      //   console.log("on record:", msg);
+      // });
       jessibuca.on("pause", function () {
         _this.playing = false;
       });
@@ -162,9 +161,9 @@ export default {
         console.log("on mute", msg);
         _this.isNotMute = !msg;
       });
-      jessibuca.on("audioInfo", function (msg) {
-        // console.log("audioInfo", msg);
-      });
+      // jessibuca.on("audioInfo", function (msg) {
+      //   // console.log("audioInfo", msg);
+      // });
 
       jessibuca.on("videoInfo", function (msg) {
         // this.videoInfo = msg;
@@ -172,32 +171,28 @@ export default {
 
       });
 
-      jessibuca.on("bps", function (bps) {
-        // console.log('bps', bps);
+      // jessibuca.on("bps", function (bps) {
+      //   // console.log('bps', bps);
 
-      });
+      // });
       let _ts = 0;
-      jessibuca.on("timeUpdate", function (ts) {
-        // console.log('timeUpdate,old,new,timestamp', _ts, ts, ts - _ts);
-        _ts = ts;
-      });
-
-      jessibuca.on("videoInfo", function (info) {
-        console.log("videoInfo", info);
-      });
-
+      // jessibuca.on("timeUpdate", function (ts) {
+      //   // console.log('timeUpdate,old,new,timestamp', _ts, ts, ts - _ts);
+      //   _ts = ts;
+      // });
       jessibuca.on("error", function (error) {
         console.log("error", error);
+        _this.destroy()
       });
 
       jessibuca.on("timeout", function () {
         console.log("timeout");
-        this.destroy()
+        _this.destroy()
       });
 
-      jessibuca.on('start', function () {
-        console.log('start');
-      })
+      // jessibuca.on('start', function () {
+      //   console.log('start');
+      // })
 
       jessibuca.on("performance", function (performance) {
         let show = "卡顿";
@@ -209,27 +204,28 @@ export default {
         _this.performance = show;
         console.log('------performance', show)
       });
-      jessibuca.on('buffer', function (buffer) {
-        // console.log('buffer', buffer);
-      })
+      // jessibuca.on('buffer', function (buffer) {
+      //   // console.log('buffer', buffer);
+      // })
 
       jessibuca.on('stats', function (stats) {
-        // console.log('stats', stats);
+        console.log('stats is', stats);
       })
 
-      jessibuca.on('kBps', function (kBps) {
-        _this.kBps = Math.round(kBps);
-      });
+      // jessibuca.on('kBps', function (kBps) {
+      //   _this.kBps = Math.round(kBps);
+      //   console.log('网速 kBps', kBps)
+      // });
 
-      // 显示时间戳 PTS
-      jessibuca.on('videoFrame', function () {
+      // // 显示时间戳 PTS
+      // jessibuca.on('videoFrame', function () {
 
-      })
+      // })
 
-      //
-      jessibuca.on('metadata', function () {
+      // //
+      // jessibuca.on('metadata', function () {
 
-      });
+      // });
     },
     playBtnClick: function (event) {
       this.play(this.videoUrl)
@@ -307,6 +303,7 @@ export default {
   destroyed() {
     if (jessibucaPlayer[this._uid]) {
       jessibucaPlayer[this._uid].destroy();
+      jessibucaPlayer[this._uid] = null
     }
     this.playing = false;
     this.loaded = false;
