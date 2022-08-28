@@ -7,7 +7,7 @@
       <el-menu-item v-if="editUser" index="/control">控制台</el-menu-item>
       <el-menu-item v-if="editUser" index="/live">分屏监控</el-menu-item>
       <el-menu-item index="/deviceList">监控设备</el-menu-item>
-      <el-menu-item index="/newpage">新页面</el-menu-item>
+<!--      <el-menu-item index="/newpage">新页面</el-menu-item>-->
 <!--      <el-menu-item index="/map">电子地图</el-menu-item>-->
 <!--      <el-menu-item index="/pushVideoList">推流列表</el-menu-item>-->
 <!--      <el-menu-item index="/streamProxyList">拉流代理</el-menu-item>-->
