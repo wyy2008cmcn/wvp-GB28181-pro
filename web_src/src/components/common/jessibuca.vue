@@ -150,7 +150,6 @@ export default {
       jessibuca.on("play", function () {
         _this.playing = true;
         const canvas = _this.$refs.container.querySelector('canvas')
-        // const videoBox = _this.$refs.container.querySelector('.video-box')
         
         console.log('------canvas', canvas && canvas.style && canvas.style.transform)
       });
