@@ -98,36 +98,58 @@ export default {
       // canvas.style.transform = `${canvas.style.transform}`
     },
     create() {
-      let options = {};
+      const showOperateBtns = true
+      const forceNoOffscreen = true; //
+      let options = {
+        isResize: true,
+        text: "",
+        loadingText: "加载中",
+        debug: true,
+        showBandwidth: showOperateBtns, // 显示网速
+        operateBtns: {
+            fullscreen: showOperateBtns,
+            screenshot: showOperateBtns,
+            play: showOperateBtns,
+            audio: showOperateBtns,
+            ptz: showOperateBtns,
+            quality: showOperateBtns,
+        },
+        qualityConfig: ['普清', '高清', '超清', '4K', '8K'],
+        forceNoOffscreen: forceNoOffscreen,
+        wasmUseVideoRender: true,
+        isNotMute: false,
+        heartTimeout: 10,
+      };
       console.log("hasAudio  " + this.hasAudio)
 
       jessibucaPlayer[this._uid] = new window.JessibucaPro(Object.assign(
         {
           container: this.$refs.container,
-          videoBuffer: 1, // 最大缓冲时长，单位秒
-          isResize: true,
+          videoBuffer: 0.2, // 最大缓冲时长，单位秒
           decoder: "static/js/jessibuca-pro/decoder-pro-simd.js",
-          showBandwidth: true,
-          isFlv: true,
-          useMSE:false,
-          // text: "WVP-PRO",
-          // background: "static/images/zlm-logo.png",
-          loadingText: "加载中",
-          hasAudio: typeof (this.hasAudio) == "undefined" ? true : this.hasAudio,
-          debug: false,
-          supportDblclickFullscreen: false, // 是否支持屏幕的双击事件，触发全屏，取消全屏事件。
-          operateBtns: {
-            fullscreen: true,
-            screenshot: true,
-            play: true,
-            audio: true,
-            recorder: true,
-          },
-          record: "record",
-          vod: this.vod,
-          forceNoOffscreen: this.forceNoOffscreen,
-          isNotMute: this.isNotMute,
-          rotate: this.isAmd ? "1,0,0,180deg" : '' // 改写了源码，rotate接收 rotate3d属性参数
+          // isResize: false,
+          // showBandwidth: true,
+          // // isFlv: true,
+          // // useMSE:false,
+          // // text: "WVP-PRO",
+          // // background: "static/images/zlm-logo.png",
+          // loadingText: "加载中",
+          // hasAudio: typeof (this.hasAudio) == "undefined" ? true : this.hasAudio,
+          // debug: false,
+          // supportDblclickFullscreen: false, // 是否支持屏幕的双击事件，触发全屏，取消全屏事件。
+          // operateBtns: {
+          //   fullscreen: true,
+          //   screenshot: true,
+          //   play: true,
+          //   audio: true,
+          //   recorder: true,
+          // },
+          // record: "record",
+          // vod: this.vod,
+          // forceNoOffscreen: this.forceNoOffscreen,
+          // wasmUseVideoRender: true,
+          // isNotMute: this.isNotMute,
+          // rotate: this.isAmd ? "1,0,0,180deg" : '' // 改写了源码，rotate接收 rotate3d属性参数
         },
         options
       ));
