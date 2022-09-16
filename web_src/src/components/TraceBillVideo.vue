@@ -88,6 +88,7 @@ export default {
         this.$message.warning('请先填写单号')
         return
       }
+      this.stopPlayRecord()
 
       const that = this
       console.log(this.params)
@@ -100,11 +101,10 @@ export default {
         if (res.status === 200) {
           // 处理时间信息
           that.list = res.data;
-          console.log('-----list', that.list)
 
           that.list.forEach((val, idx, array) => {
-            //TODO 时区不对
-            val.dateTime = dayjs(val.dateTime).subtract(14,'h').format('YYYY-MM-DD HH:mm:ss')
+            var time = new Date(val.dateTime)
+            val.dateTime = dayjs(time).format('YYYY-MM-DD HH:mm:ss')
           });
 
         } else {
@@ -124,12 +124,12 @@ export default {
     stopPlayRecord: function (callback) {
       this.$refs.jessibuca.pause();
       this.videoUrl = '';
-      this.$axios({
-        method: 'get',
-        url: '/api/playback/stop/' + this.deviceId + "/" + this.channelId + "/" + this.streamId
-      }).then(function (res) {
-        if (callback) callback()
-      });
+      // this.$axios({
+      //   method: 'get',
+      //   url: '/api/playback/stop/' + this.deviceId + "/" + this.channelId + "/" + this.streamId
+      // }).then(function (res) {
+      //   if (callback) callback()
+      // });
     },
     handleItemClick(row, index) {
       this.activeIndex = index
