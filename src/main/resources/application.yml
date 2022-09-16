@@ -98,3 +98,5 @@ version:
 
 bill:
   url: http://81.68.72.215:8080/express/api/queryOrderInfo
+trace:
+  billVideoUrl: http://81.68.72.215:9090/itemState/findByItemNumberV1

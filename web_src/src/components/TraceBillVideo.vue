@@ -2,14 +2,14 @@
   <div class="page">
     <div class="page-filter">
       <el-form ref="form" :model="params" inline>
-        <el-form-item label="单号" prop="orderNo">
-          <el-input v-model="params.orderNo" placeholder="单号" />
+        <el-form-item label="单号" prop="billCode">
+          <el-input v-model="params.billCode" placeholder="单号" />
         </el-form-item>
-        <el-form-item label="提前时间" prop="before">
+        <el-form-item label="提前时间(秒)" prop="before">
           <el-input-number v-model="params.before" :min="0" :step="1" :precision="0" />
         </el-form-item>
-        <el-form-item label="查看时间" prop="time">
-          <el-input-number v-model="params.time" :min="0" :step="1" :precision="0" />
+        <el-form-item label="查看时间(秒)" prop="time">
+          <el-input-number v-model="params.after" :min="0" :step="1" :precision="0" />
         </el-form-item>
         <el-form-item>
           <el-button type="primary" :loading="loading" @click="search">搜索</el-button>
@@ -26,7 +26,7 @@
               :type="activeIndex === index ? 'primary' : 'default'"
               @click="handleItemClick(item, index)"
             >
-              {{ item.name }}<br />{{item.startTime}}
+              {{ item.typeDesc }}<br />{{ item.dateTime }}
             </el-button>
           </el-scrollbar>
         </div>
@@ -46,7 +46,10 @@
 </template>
 
 <script>
+
+import dayjs from 'dayjs'
 import jessibucaPlayer from './common/jessibuca.vue'
+
 export default {
   components: {
     jessibucaPlayer
@@ -60,9 +63,9 @@ export default {
         webRTC: ["rtc", "rtc"],
       },
       params: {
-        orderNo: '',
-        time: undefined,
-        before: undefined
+        billCode: '',
+        after: 600,
+        before: 5
       },
       list: [],
       videoUrl: '',
@@ -74,25 +77,36 @@ export default {
       app: '',
       mediaServerId: '',
       convertKey: '',
-      deviceId: '34020000001160000001',
-      channelId: '34020000001310000010',
+      deviceId: '',
+      channelId: '',
     }
   },
   methods: {
     search() {
+
+      if (!this.params.billCode.length || /^\s+$/.test(this.params.billCode)) {
+        this.$message.warning('请先填写单号')
+        return
+      }
+
       const that = this
-      const startTime = "2022-08-27 00:00:00";
-      const endTime = "2022-08-27 23:59:59";
+      console.log(this.params)
       that.loading = true;
       this.$axios({
         method: 'get',
-        url: '/api/gb_record/query/' + this.deviceId + '/' + this.channelId + '?startTime=' + startTime + '&endTime=' + endTime
+        url: '/api/trace-bill-video/byBillCode/' + this.params.billCode
       }).then(function (res) {
         console.log(res)
-        if (res.data.code === 0) {
+        if (res.status === 200) {
           // 处理时间信息
-          that.list = res.data.data.recordList;
+          that.list = res.data;
           console.log('-----list', that.list)
+
+          that.list.forEach((val, idx, array) => {
+            //TODO 时区不对
+            val.dateTime = dayjs(val.dateTime).subtract(14,'h').format('YYYY-MM-DD HH:mm:ss')
+          });
+
         } else {
           this.$message({
             showClose: true,
@@ -120,38 +134,26 @@ export default {
     handleItemClick(row, index) {
       this.activeIndex = index
       let that = this;
-
-      let startTime = row.startTime
-      this.recordStartTime = row.startTime
-      this.showTimeText = row.startTime.split(" ")[1]
-      let endtime = row.endTime
+      let startTime = dayjs(row.dateTime) .subtract(this.params.before, 's')
+      this.recordStartTime = row.dateTime
+      this.showTimeText = row.dateTime.split(" ")[1]
+      let endTime = dayjs(row.dateTime) .add(this.params.after, 's')
       this.sliderTime = 0;
-      this.seekTime = new Date(endtime).getTime() - new Date(startTime).getTime();
-      console.log(this.seekTime)
-      if (that.streamId != "") {
-        that.stopPlayRecord(function () {
-          that.streamId = "";
-          that.handleItemClick(row, index);
-        })
-      } else {
-        const param = {
-          startTime: row.startTime,
-          endTime: row.endTime
-        }
-        this.$axios({
-          method: 'get',
-          url: `/api/playback/start/${this.deviceId}/${this.channelId}`,
-          params: param
-        }).then(function (res) {
-          that.streamInfo = res.data;
-          that.app = that.streamInfo.app;
-          that.streamId = that.streamInfo.stream;
-          that.mediaServerId = that.streamInfo.mediaServerId;
-          that.ssrc = that.streamInfo.ssrc;
-          that.videoUrl = that.getUrlByStreamInfo();
-          that.recordPlay = true;
-        });
-      }
+      this.seekTime = new Date(endTime).getTime() - new Date(startTime).getTime();
+
+      this.$axios({
+        method: 'get',
+        url: '/api/playback/start/' + row.deviceId + '/' + row.channelId + '?startTime=' +  dayjs(startTime).format('YYYY-MM-DD HH:mm:ss') + '&endTime=' +
+          dayjs(endTime).format('YYYY-MM-DD HH:mm:ss')
+      }).then(function (res) {
+        that.streamInfo = res.data;
+        that.app = that.streamInfo.app;
+        that.streamId = that.streamInfo.stream;
+        that.mediaServerId = that.streamInfo.mediaServerId;
+        that.ssrc = that.streamInfo.ssrc;
+        that.videoUrl = that.getUrlByStreamInfo();
+        that.recordPlay = true;
+      });
     },
     play(streamInfo, hasAudio) {
       this.streamInfo = streamInfo;

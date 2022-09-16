@@ -18,8 +18,8 @@ import media from '../components/setting/Media.vue'
 import live from '../components/live.vue'
 import deviceTree from '../components/common/DeviceTree.vue'
 import userManager from '../components/UserManager.vue'
-// 新页面
-import NewPage from '../components/NewPage.vue'
+//追件系统页面
+import traceBillVideo from '../components/TraceBillVideo.vue'
 
 import wasmPlayer from '../components/common/jessibuca.vue'
 import rtcPlayer from '../components/dialog/rtcPlayer.vue'
@@ -113,9 +113,9 @@ export default new VueRouter({
           component: userManager,
         },
         {
-          path: '/newpage',
-          name: 'NewPage',
-          component: NewPage
+          path: '/traceBillVideo',
+          name: 'traceBillVideo',
+          component: traceBillVideo
         }
       ]
     },
