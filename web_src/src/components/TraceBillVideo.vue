@@ -49,6 +49,14 @@
 
 import dayjs from 'dayjs'
 import jessibucaPlayer from './common/jessibuca.vue'
+var customParseFormat = require('dayjs/plugin/customParseFormat')
+var utc = require('dayjs/plugin/utc')
+var timezone = require('dayjs/plugin/timezone') // dependent on utc plugin
+dayjs.extend(utc)
+dayjs.extend(timezone)
+dayjs.extend(customParseFormat)
+
+const tz = dayjs.tz.guess()
 
 export default {
   components: {
@@ -103,8 +111,8 @@ export default {
           that.list = res.data;
 
           that.list.forEach((val, idx, array) => {
-            var time = new Date(val.dateTime)
-            val.dateTime = dayjs(time).format('YYYY-MM-DD HH:mm:ss')
+            // cst 时区：https://datetime360.com/cn/Beijing-cst-cuba-time/
+            val.dateTime = dayjs(val.dateTime).subtract(14, 'hour').format('YYYY-MM-DD HH:mm:ss')
           });
 
         } else {
@@ -134,10 +142,10 @@ export default {
     handleItemClick(row, index) {
       this.activeIndex = index
       let that = this;
-      let startTime = dayjs(row.dateTime) .subtract(this.params.before, 's')
+      let startTime = dayjs(row.dateTime).subtract(this.params.before, 's')
       this.recordStartTime = row.dateTime
       this.showTimeText = row.dateTime.split(" ")[1]
-      let endTime = dayjs(row.dateTime) .add(this.params.after, 's')
+      let endTime = dayjs(row.dateTime).add(this.params.after, 's')
       this.sliderTime = 0;
       this.seekTime = new Date(endTime).getTime() - new Date(startTime).getTime();
 

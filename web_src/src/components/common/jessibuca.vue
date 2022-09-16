@@ -253,7 +253,7 @@ export default {
       this.play(this.videoUrl)
     },
     play: function (url) {
-      console.log(url)
+      console.log('------play', url)
       url = url.replace("192.168.6.248", "36.26.10.190");
       console.log("replace"+url)
       if (jessibucaPlayer[this._uid]) {
