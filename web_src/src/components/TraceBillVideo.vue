@@ -111,7 +111,6 @@ export default {
           that.list = res.data;
 
           that.list.forEach((val, idx, array) => {
-            // cst 时区：https://datetime360.com/cn/Beijing-cst-cuba-time/
             val.dateTime = dayjs(val.dateTime).subtract(14, 'hour').format('YYYY-MM-DD HH:mm:ss')
           });
 
@@ -132,12 +131,6 @@ export default {
     stopPlayRecord: function (callback) {
       this.$refs.jessibuca.pause();
       this.videoUrl = '';
-      // this.$axios({
-      //   method: 'get',
-      //   url: '/api/playback/stop/' + this.deviceId + "/" + this.channelId + "/" + this.streamId
-      // }).then(function (res) {
-      //   if (callback) callback()
-      // });
     },
     handleItemClick(row, index) {
       this.activeIndex = index
