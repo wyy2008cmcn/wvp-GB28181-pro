@@ -441,8 +441,7 @@ export default {
 .monitor-page{
   width: 100%;
   text-align: left;
-  // height: calc(100vh - 80px);
-  // overflow: hidden;
+
   display: flex;
   justify-content: space-between;
 }
