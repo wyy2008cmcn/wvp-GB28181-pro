@@ -256,6 +256,9 @@ export default {
       console.log('------play', url)
       url = url.replace("192.168.6.248", "36.26.10.190");
       console.log("replace"+url)
+      if(url === '') {
+        return;
+      }
       if (jessibucaPlayer[this._uid]) {
         this.destroy();
       }
