@@ -38,7 +38,7 @@
               <el-button type="primary" :loading="submitLoading" @click="onSubmit">确认</el-button>
             </el-form-item>
           </el-form>
-        </div>
+      </div>
 
         <div class="billcode-collapse">
           <el-collapse accordion>
@@ -77,6 +77,12 @@
             end-placeholder="结束时间">
           </el-time-picker>
         </div>
+
+      <div style="width: 100%; text-align: left">
+        <span class="demonstration" style="padding: 12px 36px 12px 0;float: left;">{{showTimeText}}</span>
+        <el-slider style="width: 80%; float:left;" v-model="sliderTime" @change="gbSeek(sliderTime)"
+                   :show-tooltip="false"></el-slider>
+      </div>
 
 <!--        <el-carousel :interval="5000" arrow="always">-->
 <!--          <el-carousel-item v-for="item in 4" :key="item">-->
@@ -152,7 +158,7 @@ const tz = dayjs.tz.guess()
 
 export default {
   components: {
-    jessibucaPlayer
+    jessibucaPlayer,
   },
   data() {
     return {
@@ -198,6 +204,9 @@ export default {
       convertKey: '',
       deviceId: '',
       channelId: '',
+      recordStartTime: 0,
+      showTimeText: "00:00:00",
+      loadSnap: {},
     }
   },
   mounted() {
@@ -272,11 +281,6 @@ export default {
         this.$message.warning('请先填写单号')
         return
       }
-      // console.log("device palyer onSubmit");
-      // console.log(this.billCode);
-      // console.log(this.deviceId)
-      // console.log(this.channelId)
-      
 
     },
     search() {
@@ -382,35 +386,12 @@ export default {
     },
     handleItemClick(row, index) {
       this.activeIndex = index
-
-      // let that = this;
-      // let startTime = dayjs(row.dateTime).subtract(this.params.before, 's')
-      // this.recordStartTime = row.dateTime
-      // this.showTimeText = row.dateTime.split(" ")[1]
-      // let endTime = dayjs(row.dateTime).add(this.params.after, 's')
-      // this.sliderTime = 0;
-      // this.seekTime = new Date(endTime).getTime() - new Date(startTime).getTime();
-
       this.playRecord({
         deviceId: row.deviceId,
         channelId: row.channelId,
         startTime: dayjs(dayjs(row.dateTime).subtract(this.params.before, 's')).format('YYYY-MM-DD HH:mm:ss'),
         endTime: dayjs(dayjs(row.dateTime).add(this.params.after, 's')).format('YYYY-MM-DD HH:mm:ss')
       });
-
-      // this.$axios({
-      //   method: 'get',
-      //   url: '/api/playback/start/' + row.deviceId + '/' + row.channelId + '?startTime=' +  dayjs(startTime).format('YYYY-MM-DD HH:mm:ss') + '&endTime=' +
-      //     dayjs(endTime).format('YYYY-MM-DD HH:mm:ss')
-      // }).then(function (res) {
-      //   that.streamInfo = res.data;
-      //   that.app = that.streamInfo.app;
-      //   that.streamId = that.streamInfo.stream;
-      //   that.mediaServerId = that.streamInfo.mediaServerId;
-      //   that.ssrc = that.streamInfo.ssrc;
-      //   that.videoUrl = that.getUrlByStreamInfo();
-      //   that.recordPlay = true;
-      // });
     },
     play(streamInfo, hasAudio) {
       this.streamInfo = streamInfo;
@@ -432,6 +413,25 @@ export default {
     playFromStreamInfo (realHasAudio, streamInfo) {
       this.hasAudio = realHasAudio && this.hasAudio;
       this.$refs.jessibuca.play(this.getUrlByStreamInfo(streamInfo))
+    },
+    gbSeek(val) {
+      console.log('前端控制：seek ');
+      console.log(this.seekTime);
+      console.log(this.sliderTime);
+      console.log(val)
+      let showTime = new Date(new Date(this.recordStartTime).getTime() + this.seekTime * val / 100)
+      let hour = showTime.getHours();
+      let minutes = showTime.getMinutes();
+      let seconds = showTime.getSeconds();
+      this.showTimeText = (hour < 10 ? ("0" + hour) : hour) + ":" + (minutes < 10 ? ("0" + minutes) : minutes) + ":" + (seconds < 10 ? ("0" + seconds) : seconds)
+      this.$axios({
+        method: 'get',
+        url: `/api/playback/seek/${this.streamId}/` + Math.floor(this.seekTime * val / 100000)
+      }).then((res) => {
+        setTimeout(() => {
+          this.$refs.jessibuca.play(this.getUrlByStreamInfo())
+        }, 600)
+      });
     }
   }
 }
