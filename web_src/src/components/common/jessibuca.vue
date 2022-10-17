@@ -254,7 +254,7 @@ export default {
     },
     play: function (url) {
       console.log('------play', url)
-      url = url.replace("192.168.6.248", "36.26.10.190");
+      url = url.replace("192.168.1.218", "36.26.15.162");
       console.log("replace"+url)
       if(url === '') {
         return;

@@ -662,7 +662,7 @@ LOCK TABLES `user_role` WRITE;
 /*!40000 ALTER TABLE `user_role`
     DISABLE KEYS */;
 INSERT INTO `user_role`
-VALUES (1, 'admin', '0 ', '2021 - 04 - 13 14:14:57', '2021 - 04 - 13 14:14:57');
+VALUES (1, 'admin', '0', '2021 - 04 - 13 14:14:57', '2021 - 04 - 13 14:14:57');
 /*!40000 ALTER TABLE `user_role`
     ENABLE KEYS */;
 UNLOCK TABLES;
